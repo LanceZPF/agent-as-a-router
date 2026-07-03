@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="../AgenticRouter.Gui/AgenticRouter.Gui.csproj" />
   <Project Path="../AgenticRouter.Tests/AgenticRouter.Tests.csproj" Id="6bc19e70-13cf-4f60-91c9-7282407a6ff6" />
   <Project Path="AgenticRouter.csproj" />
 </Solution>
