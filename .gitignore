@@ -527,3 +527,4 @@ packages/graphrag-*/example_notebooks/**/cache
 # Local ASP.NET Core config overrides that may hold secrets (e.g. literal provider API keys)
 appsettings.Local.json
 appsettings.*.local.json
+appsettings.*.json
