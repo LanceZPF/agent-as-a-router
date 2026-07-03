@@ -26,7 +26,13 @@ public class ProxyMiddleware : IMiddleware
         "Upgrade"
     ];
 
-    private static readonly string[] AlwaysSkippedRequestHeaders = ["Host", "Content-Type", "Content-Length"];
+    // "Authorization" carries the client's inbound credential to the proxy itself (e.g. a placeholder
+    // token an IDE/BYOK client requires but never validates), not a credential for the upstream provider.
+    // It must never be forwarded as-is: for providers whose AuthHeaderName is something else (e.g.
+    // Anthropic's "x-api-key"), forwarding it would send the client's bogus token to the upstream
+    // alongside the real injected credential, and some providers reject the request outright when both
+    // are present.
+    private static readonly string[] AlwaysSkippedRequestHeaders = ["Host", "Content-Type", "Content-Length", "Authorization"];
 
     // The OpenAI-compatible model discovery path. Answered locally from configuration (mirroring LiteLLM's
     // /v1/models behavior) since it has no request body to resolve a single upstream provider from, and no

@@ -82,6 +82,54 @@ public class ProxyMiddlewareTests
     }
 
     [Fact]
+    public async Task InvokeAsync_NeverForwardsTheClientsInboundAuthorizationHeader_ForNonAuthorizationProviders()
+    {
+        // Regression test: a BYOK client (e.g. an IDE extension) sends its own placeholder "Authorization"
+        // header to satisfy its own client library, not knowing it's talking to Anthropic. Providers whose
+        // AuthHeaderName is something other than "Authorization" (e.g. Anthropic's "x-api-key") must never
+        // forward that client header upstream alongside the injected credential - some upstreams reject the
+        // request outright ("Invalid Anthropic API Key") when both a bogus Authorization and a valid
+        // x-api-key are present.
+        var loggerMock = new Mock<ILogger<ProxyMiddleware>>();
+        var resolver = ModelRouteResolverTestFactory.Create(
+            modelName: "claude-sonnet-5",
+            providerModelId: "claude-sonnet-5",
+            baseUrl: "https://api.anthropic.com",
+            authHeaderName: "x-api-key",
+            authHeaderScheme: "",
+            apiKey: "real-anthropic-key");
+        var interceptor = new RequestInterceptor(Mock.Of<ILogger<RequestInterceptor>>(), resolver);
+
+        var handler = new DelegatingHandlerStub(request =>
+        {
+            Assert.False(request.Headers.Contains("Authorization"));
+            Assert.Equal("real-anthropic-key", request.Headers.GetValues("x-api-key").Single());
+
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{}", Encoding.UTF8, "application/json")
+            });
+        });
+
+        var middleware = new ProxyMiddleware(loggerMock.Object, interceptor, new HttpClient(handler));
+
+        var context = new DefaultHttpContext();
+        context.Request.Method = HttpMethods.Post;
+        context.Request.Scheme = "https";
+        context.Request.Host = new HostString("127.0.0.1:5001");
+        context.Request.Path = "/v1/messages";
+        context.Request.Headers["Authorization"] = "Bearer client-placeholder-token";
+        var requestBody = Encoding.UTF8.GetBytes("""{"model":"claude-sonnet-5"}""");
+        context.Request.Body = new MemoryStream(requestBody);
+        context.Request.ContentLength = requestBody.Length;
+        context.Response.Body = new MemoryStream();
+
+        await middleware.InvokeAsync(context, _ => Task.CompletedTask);
+
+        Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
+    }
+
+    [Fact]
     public async Task InvokeAsync_DoesNotForwardToTheProxysOwnAddress_EvenWhenRequestHostMatchesIt()
     {
         // Regression test: the forwarding target must come from the resolved upstream route, never from
