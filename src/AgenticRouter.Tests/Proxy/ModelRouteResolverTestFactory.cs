@@ -49,4 +49,27 @@ internal static class ModelRouteResolverTestFactory
 
     public static IModelRouteResolver Empty() =>
         new ModelRouteResolver(Options.Create(new ModelRoutingOptions()), Mock.Of<IEnvironmentVariableProvider>());
+
+    /// <summary>
+    /// Builds a resolver configured with several models across one or more providers, for tests that need
+    /// to observe ordering or multi-provider behavior (e.g. <see cref="IModelRouteResolver.ListModels"/>).
+    /// </summary>
+    public static IModelRouteResolver CreateWithModelList(params (string ModelName, string Provider, string ProviderModelId)[] models)
+    {
+        var providers = new Dictionary<string, ProviderOptions>(StringComparer.OrdinalIgnoreCase);
+        foreach (var providerName in models.Select(m => m.Provider).Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            providers[providerName] = new ProviderOptions { BaseUrl = "https://example.com" };
+        }
+
+        var options = new ModelRoutingOptions
+        {
+            Providers = providers,
+            ModelList = models
+                .Select(m => new ModelRouteEntry { ModelName = m.ModelName, Provider = m.Provider, ProviderModelId = m.ProviderModelId })
+                .ToList()
+        };
+
+        return new ModelRouteResolver(Options.Create(options), Mock.Of<IEnvironmentVariableProvider>());
+    }
 }
