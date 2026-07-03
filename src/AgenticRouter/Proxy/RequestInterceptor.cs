@@ -49,6 +49,12 @@ namespace AgenticRouter.Proxy
         }
 
         /// <summary>
+        /// Lists the client-facing models this proxy is configured to route. Used to answer the
+        /// OpenAI-compatible model discovery endpoint (<c>GET /v1/models</c>).
+        /// </summary>
+        public IReadOnlyList<AvailableModel> ListAvailableModels() => _modelRouteResolver.ListModels();
+
+        /// <summary>
         /// Reads the request body, resolves the requested model against the known-model allowlist, and
         /// rewrites <c>model</c> to the upstream provider's model id. The proxy only ever forwards to
         /// upstreams present in this allowlist, so a request can never be routed back to the proxy itself.

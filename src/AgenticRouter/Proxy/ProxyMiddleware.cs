@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
@@ -27,6 +28,11 @@ public class ProxyMiddleware : IMiddleware
 
     private static readonly string[] AlwaysSkippedRequestHeaders = ["Host", "Content-Type", "Content-Length"];
 
+    // The OpenAI-compatible model discovery path. Answered locally from configuration (mirroring LiteLLM's
+    // /v1/models behavior) since it has no request body to resolve a single upstream provider from, and no
+    // single upstream to forward it to anyway when ModelList spans multiple providers.
+    private const string ModelsListPath = "/v1/models";
+
     private readonly ILogger<ProxyMiddleware> _logger;
     private readonly HttpClient _httpClient;
     private readonly RequestInterceptor _interceptor;
@@ -52,6 +58,12 @@ public class ProxyMiddleware : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         _logger.LogInformation("Proxy middleware caught request to {Path}", context.Request.Path);
+
+        if (IsModelsListRequest(context.Request))
+        {
+            await WriteModelsListResponseAsync(context);
+            return;
+        }
 
         await _interceptor.InterceptRequestAsync(context);
 
@@ -148,6 +160,49 @@ public class ProxyMiddleware : IMiddleware
 
         return names;
     }
+
+    /// <summary>
+    /// Determines whether a request targets the OpenAI-compatible model discovery endpoint
+    /// (<c>GET /v1/models</c>), matched case-insensitively since path casing conventions vary by client.
+    /// </summary>
+    private static bool IsModelsListRequest(HttpRequest request) =>
+        HttpMethods.IsGet(request.Method) &&
+        string.Equals(request.Path.Value, ModelsListPath, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Writes the configured model list as an OpenAI-compatible <c>/v1/models</c> response, mirroring
+    /// LiteLLM's behavior of answering this endpoint from local configuration rather than forwarding it
+    /// upstream.
+    /// </summary>
+    private async Task WriteModelsListResponseAsync(HttpContext context)
+    {
+        var entries = _interceptor.ListAvailableModels()
+            .Select(model => new ModelListEntry(model.ModelName, "model", 0, model.Provider))
+            .ToList();
+
+        context.Response.StatusCode = StatusCodes.Status200OK;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsync(
+            JsonSerializer.Serialize(new ModelsListResponse("list", entries)),
+            context.RequestAborted);
+    }
+
+    /// <summary>
+    /// A single entry in the <c>/v1/models</c> response, shaped to match OpenAI's model list schema.
+    /// </summary>
+    private sealed record ModelListEntry(
+        [property: JsonPropertyName("id")] string Id,
+        [property: JsonPropertyName("object")] string Object,
+        [property: JsonPropertyName("created")] long Created,
+        [property: JsonPropertyName("owned_by")] string OwnedBy);
+
+    /// <summary>
+    /// The top-level <c>/v1/models</c> response envelope, shaped to match OpenAI's model list schema.
+    /// </summary>
+    private sealed record ModelsListResponse(
+        [property: JsonPropertyName("object")] string Object,
+        [property: JsonPropertyName("data")] IReadOnlyList<ModelListEntry> Data);
 
     private static async Task WriteModelNotFoundResponseAsync(HttpContext context, string errorMessage)
     {

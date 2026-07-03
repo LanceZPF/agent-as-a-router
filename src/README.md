@@ -146,6 +146,33 @@ curl http://localhost:5001/v1/chat/completions \
 An unconfigured model name returns a `400` with an `invalid_request_error`
 body instead of being forwarded.
 
+### Model discovery (`GET /v1/models`)
+
+Many OpenAI-compatible clients (including VS Code's Copilot Chat BYOK
+providers) call `GET /v1/models` before anything else, to discover which
+models are available. Since this request has no body and your `ModelList`
+can span multiple upstream providers, the proxy answers it locally from
+configuration — mirroring how LiteLLM's proxy handles the same endpoint —
+rather than forwarding it anywhere:
+
+```bash
+curl http://localhost:5001/v1/models
+```
+
+```json
+{
+  "object": "list",
+  "data": [
+    { "id": "gpt-5.4", "object": "model", "created": 0, "owned_by": "openai" },
+    { "id": "kimi-k2.5", "object": "model", "created": 0, "owned_by": "moonshot" }
+  ]
+}
+```
+
+`id` is the client-facing `ModelName`, and `owned_by` is the configured
+provider key. `created` is always `0` — there's no meaningful creation
+timestamp for a statically configured route.
+
 ## Running with Docker
 
 A `Dockerfile` is provided for containerized runs:

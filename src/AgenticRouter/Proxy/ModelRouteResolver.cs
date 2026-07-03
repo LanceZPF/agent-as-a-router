@@ -17,7 +17,21 @@ public interface IModelRouteResolver
     /// <param name="route">The resolved route, when successful.</param>
     /// <returns><see langword="true"/> if the model is known and resolved; otherwise <see langword="false"/>.</returns>
     bool TryResolve(string? modelName, [NotNullWhen(true)] out ResolvedModelRoute? route);
+
+    /// <summary>
+    /// Lists the client-facing models this proxy is configured to route, in the order they appear in
+    /// configuration. Used to answer the OpenAI-compatible model discovery endpoint (<c>GET /v1/models</c>)
+    /// without forwarding the request to any single upstream provider.
+    /// </summary>
+    IReadOnlyList<AvailableModel> ListModels();
 }
+
+/// <summary>
+/// A client-facing model this proxy is configured to route, along with the provider key it resolves to.
+/// </summary>
+/// <param name="ModelName">The client-facing model name, as it appears in <see cref="ModelRouteEntry.ModelName"/>.</param>
+/// <param name="Provider">The provider key this model routes to.</param>
+public sealed record AvailableModel(string ModelName, string Provider);
 
 /// <summary>
 /// A model resolved to a concrete upstream provider, along with the credentials to authenticate the forwarded request.
@@ -40,6 +54,7 @@ public sealed record ResolvedModelRoute(
 public sealed class ModelRouteResolver : IModelRouteResolver
 {
     private readonly Dictionary<string, (ModelRouteEntry Entry, ProviderOptions Provider)> _routes;
+    private readonly IReadOnlyList<ModelRouteEntry> _orderedEntries;
     private readonly IEnvironmentVariableProvider _environment;
 
     /// <summary>
@@ -58,6 +73,7 @@ public sealed class ModelRouteResolver : IModelRouteResolver
         var value = options.Value;
         value.EnsureValid();
 
+        _orderedEntries = value.ModelList;
         _routes = value.ModelList.ToDictionary(
             entry => entry.ModelName,
             entry => (entry, value.Providers[entry.Provider]),
@@ -93,6 +109,10 @@ public sealed class ModelRouteResolver : IModelRouteResolver
 
         return true;
     }
+
+    /// <inheritdoc />
+    public IReadOnlyList<AvailableModel> ListModels() =>
+        _orderedEntries.Select(entry => new AvailableModel(entry.ModelName, entry.Provider)).ToList();
 
     /// <summary>
     /// Resolves the API key for a provider, preferring a literal <see cref="ProviderOptions.ApiKey"/> value over

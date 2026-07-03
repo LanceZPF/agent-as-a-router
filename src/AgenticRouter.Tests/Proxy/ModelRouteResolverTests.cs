@@ -188,4 +188,34 @@ public class ModelRouteResolverTests
         Assert.True(resolved);
         Assert.Null(route!.AuthHeaderValue);
     }
+
+    // Verifies that ListModels() surfaces every configured model with its provider key, in the same order
+    // they appear in configuration, so /v1/models can be answered deterministically from this data.
+    [Fact]
+    public void ListModels_ReturnsAllConfiguredModels_WithProviderKeys_InConfigurationOrder()
+    {
+        var resolver = ModelRouteResolverTestFactory.CreateWithModelList(
+            ("gpt-5.4", "openai", "gpt-5.4"),
+            ("claude-opus-4.6", "anthropic", "claude-opus-4-6"),
+            ("kimi-k2.5", "moonshot", "kimi-k2.5"));
+
+        var models = resolver.ListModels();
+
+        Assert.Equal(
+        [
+            new AvailableModel("gpt-5.4", "openai"),
+            new AvailableModel("claude-opus-4.6", "anthropic"),
+            new AvailableModel("kimi-k2.5", "moonshot")
+        ], models);
+    }
+
+    // Verifies that an empty configuration yields an empty model list rather than throwing, so /v1/models
+    // can still return a valid (empty) response for a proxy with no routes configured yet.
+    [Fact]
+    public void ListModels_EmptyConfiguration_ReturnsEmptyList()
+    {
+        var resolver = ModelRouteResolverTestFactory.Empty();
+
+        Assert.Empty(resolver.ListModels());
+    }
 }

@@ -125,6 +125,21 @@ public class RequestInterceptorTests
         Assert.NotNull(result.ErrorMessage);
     }
 
+    // Verifies that ListAvailableModels delegates directly to the underlying resolver, so the interceptor
+    // stays a thin pass-through for the model-discovery data ProxyMiddleware needs to answer /v1/models.
+    [Fact]
+    public void ListAvailableModels_DelegatesToModelRouteResolver()
+    {
+        var resolver = ModelRouteResolverTestFactory.CreateWithModelList(
+            ("gpt-5.4", "openai", "gpt-5.4"),
+            ("kimi-k2.5", "moonshot", "kimi-k2.5"));
+        var interceptor = new RequestInterceptor(Mock.Of<ILogger<RequestInterceptor>>(), resolver);
+
+        var models = interceptor.ListAvailableModels();
+
+        Assert.Equal(resolver.ListModels(), models);
+    }
+
     private static DefaultHttpContext CreateContextWithBody(string body)
     {
         var context = new DefaultHttpContext();
