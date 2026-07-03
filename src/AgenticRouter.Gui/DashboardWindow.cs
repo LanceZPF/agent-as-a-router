@@ -17,6 +17,7 @@ internal sealed class DashboardWindow : IDisposable
     private readonly ManualResetEventSlim _windowReady = new(initialState: false);
     private volatile bool _isExiting;
     private PhotinoWindow? _window;
+    private Exception? _startupException;
 
     public DashboardWindow()
     {
@@ -29,6 +30,11 @@ internal sealed class DashboardWindow : IDisposable
         _uiThread.Start();
 
         _windowReady.Wait();
+
+        if (_startupException is not null)
+        {
+            throw new InvalidOperationException("Failed to create the dashboard window.", _startupException);
+        }
     }
 
     /// <summary>Restores the dashboard window and brings it to the foreground.</summary>
@@ -49,24 +55,35 @@ internal sealed class DashboardWindow : IDisposable
 
     private void RunMessageLoop()
     {
-        _window = new PhotinoWindow()
-            .SetTitle("AgenticRouter Dashboard")
-            .SetUseOsDefaultSize(false)
-            .SetSize(new Size(1024, 700))
-            .Center()
-            .RegisterWindowCreatedHandler((_, _) => NativeMethods.Hide(_window!.WindowHandle))
-            .RegisterMinimizedHandler((_, _) => NativeMethods.Hide(_window!.WindowHandle))
-            .RegisterWindowClosingHandler((_, _) =>
-            {
-                if (_isExiting)
+        try
+        {
+            _window = new PhotinoWindow()
+                .SetTitle("AgenticRouter Dashboard")
+                .SetUseOsDefaultSize(false)
+                .SetSize(new Size(1024, 700))
+                .Center()
+                .RegisterWindowCreatedHandler((_, _) => NativeMethods.Hide(_window!.WindowHandle))
+                .RegisterMinimizedHandler((_, _) => NativeMethods.Hide(_window!.WindowHandle))
+                .RegisterWindowClosingHandler((_, _) =>
                 {
-                    return false; // Let the real close proceed.
-                }
+                    if (_isExiting)
+                    {
+                        return false; // Let the real close proceed.
+                    }
 
-                NativeMethods.Hide(_window!.WindowHandle);
-                return true; // Cancel the close; hide to tray instead.
-            })
-            .Load(DashboardUrl);
+                    NativeMethods.Hide(_window!.WindowHandle);
+                    return true; // Cancel the close; hide to tray instead.
+                })
+                .Load(DashboardUrl);
+        }
+        catch (Exception ex)
+        {
+            // Unblock the constructor rather than hanging forever if window creation fails (e.g. the
+            // native Photino/WebView2 runtime is missing or misconfigured).
+            _startupException = ex;
+            _windowReady.Set();
+            return;
+        }
 
         _windowReady.Set();
 

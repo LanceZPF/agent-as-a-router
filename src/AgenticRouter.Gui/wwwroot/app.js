@@ -8,6 +8,10 @@ const mockRecentRoutes = [
 const tbody = document.getElementById("recent-routes");
 for (const route of mockRecentRoutes) {
   const row = document.createElement("tr");
-  row.innerHTML = `<td>${route.model}</td><td>${route.provider}</td><td>${route.status}</td>`;
+  for (const value of [route.model, route.provider, route.status]) {
+    const cell = document.createElement("td");
+    cell.textContent = value;
+    row.appendChild(cell);
+  }
   tbody.appendChild(row);
 }
