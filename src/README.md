@@ -115,9 +115,22 @@ Each provider resolves its API key in this order:
 
 Prefer `ApiKeyEnvVar` for anything checked into source control —
 `appsettings.json` is typically committed to git, so a literal `ApiKey`
-belongs only in an untracked/local override file (e.g.
-`appsettings.Local.json`, excluded via `.gitignore`) or a secret store, not
-in the tracked base config.
+belongs only in an untracked/local override file or a secret store, not in
+the tracked base config.
+
+The proxy only auto-loads `appsettings.json` plus
+`appsettings.{DOTNET_ENVIRONMENT}.json` — there is no ad hoc
+`appsettings.Local.json` convention wired up. To use an untracked override
+file, set the `DOTNET_ENVIRONMENT` variable to match its name before
+running, e.g. `appsettings.Development.json` requires
+`DOTNET_ENVIRONMENT=Development` (already set for you by the `AgenticRouter`
+launch profile in `Properties/launchSettings.json`).
+
+**Note:** because `Program.cs` builds a plain generic host
+(`Host.CreateDefaultBuilder`, not a web host), the environment variable that
+controls this is `DOTNET_ENVIRONMENT` — **not** `ASPNETCORE_ENVIRONMENT`,
+which has no effect here despite being the more common ASP.NET Core
+convention.
 
 ## 4. Run the proxy
 
