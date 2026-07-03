@@ -163,11 +163,12 @@ public class ProxyMiddleware : IMiddleware
 
     /// <summary>
     /// Determines whether a request targets the OpenAI-compatible model discovery endpoint
-    /// (<c>GET /v1/models</c>), matched case-insensitively since path casing conventions vary by client.
+    /// (<c>GET /v1/models</c>), matched case-insensitively and with an optional trailing slash tolerated,
+    /// since both conventions vary by client.
     /// </summary>
     private static bool IsModelsListRequest(HttpRequest request) =>
         HttpMethods.IsGet(request.Method) &&
-        string.Equals(request.Path.Value, ModelsListPath, StringComparison.OrdinalIgnoreCase);
+        string.Equals(request.Path.Value?.TrimEnd('/'), ModelsListPath, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Writes the configured model list as an OpenAI-compatible <c>/v1/models</c> response, mirroring

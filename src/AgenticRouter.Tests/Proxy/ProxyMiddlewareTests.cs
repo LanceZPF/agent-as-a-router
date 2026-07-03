@@ -317,6 +317,26 @@ public class ProxyMiddlewareTests
         Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
     }
 
+    // Verifies that a trailing slash on the path is tolerated, since some clients/proxies normalize
+    // requests to include one (e.g. GET /v1/models/) and it should still be treated as model discovery.
+    [Fact]
+    public async Task InvokeAsync_GetModelsList_TrailingSlashIsTolerated()
+    {
+        var resolver = ModelRouteResolverTestFactory.CreateWithModelList(("gpt-5.4", "openai", "gpt-5.4"));
+        var interceptor = new RequestInterceptor(Mock.Of<ILogger<RequestInterceptor>>(), resolver);
+        var handler = new DelegatingHandlerStub(_ => throw new InvalidOperationException("Upstream should never be called for /v1/models."));
+        var middleware = new ProxyMiddleware(Mock.Of<ILogger<ProxyMiddleware>>(), interceptor, new HttpClient(handler));
+
+        var context = new DefaultHttpContext();
+        context.Request.Method = HttpMethods.Get;
+        context.Request.Path = "/v1/models/";
+        context.Response.Body = new MemoryStream();
+
+        await middleware.InvokeAsync(context, _ => Task.CompletedTask);
+
+        Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
+    }
+
     // Verifies that a non-GET request to the /v1/models path is not treated as a model-discovery request:
     // it still falls through to normal per-model routing, since the discovery short-circuit is GET-only.
     [Fact]
