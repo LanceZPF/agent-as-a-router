@@ -20,16 +20,14 @@ public sealed class NotImplementedRouterModelClient : IRouterModelClient
     }
 
     /// <inheritdoc />
-    /// <exception cref="NotImplementedException">Always thrown: no real model backend is configured.</exception>
+    /// <exception cref="NotImplementedException">Always faults: no real model backend is configured.</exception>
     public Task<string> GetResponseAsync(string model, string prompt, CancellationToken cancellationToken = default)
     {
         _logger.LogError(
-            "NotImplementedRouterModelClient.GetResponseAsync was invoked for model '{Model}', but no real " +
-            "IRouterModelClient implementation is registered. The router/agent subsystem is not wired up to " +
-            "a model backend yet.",
+            "NotImplementedRouterModelClient.GetResponseAsync was invoked for model '{Model}', but no real model backend is wired up yet; this is only a DI-validation placeholder.",
             model);
 
-        throw new NotImplementedException(
-            "No real IRouterModelClient is configured. Register a concrete IRouterModelClient before using AgentAsARouter.");
+        return Task.FromException<string>(new NotImplementedException(
+            "No real model backend is wired up for IRouterModelClient. Register a concrete implementation before using AgentAsARouter."));
     }
 }
