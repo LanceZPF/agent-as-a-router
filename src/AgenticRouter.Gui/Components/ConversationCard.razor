@@ -1,0 +1,74 @@
+@* One conversation (session) in the Live Stream left panel. *@
+<button @onclick="() => OnSelect.InvokeAsync(Conversation.Id)"
+        class="w-full text-left rounded card-hover"
+        style="background:@(IsSelected ? "#263548" : "#1e293b");
+               border:1px solid @(IsSelected ? "#38bdf8" : "#334155");
+               border-left:3px solid @(Conversation.HasFallbackTurns ? "#f59e0b" : IsSelected ? "#38bdf8" : "#334155");
+               padding:8px 10px">
+    @* Title + fallback badge *@
+    <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-semibold text-slate-200 ls-truncate">@Conversation.Title</span>
+        @if (Conversation.HasFallbackTurns)
+        {
+            <span class="ml-auto shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold"
+                  style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44"
+                  title="One or more turns in this conversation used fallback routing">⚠</span>
+        }
+    </div>
+
+    @* First → last turn timestamps *@
+    <div class="text-xs font-mono text-slate-500 mb-1"
+         title="Timestamps of the first and last turn in this conversation">
+        @Conversation.FirstTimestamp <span class="text-slate-600">→</span> @Conversation.LastTimestamp
+    </div>
+
+    @* Cost · tokens · turns *@
+    <div class="flex items-center gap-2 text-xs font-mono">
+        <span style="color:#10b981" title="Total LLM API cost across all turns in this conversation">
+            $@Conversation.TotalCost.ToString("F6", CultureInfo.InvariantCulture)
+        </span>
+        <span class="text-slate-600">·</span>
+        <span class="text-slate-300" title="Total prompt + completion tokens across all turns">
+            @FormatTokens(Conversation.TotalPromptTokens + Conversation.TotalCompletionTokens) tok
+        </span>
+        <span class="text-slate-600">·</span>
+        <span class="text-slate-400" title="Number of turns (multi-step agent workflows) in this conversation">
+            @Conversation.Turns.Count @(Conversation.Turns.Count == 1 ? "turn" : "turns")
+        </span>
+    </div>
+
+    @* Agent pool: color-dotted names for the first two distinct agents *@
+    <div class="flex items-center gap-2 mt-1 text-xs text-slate-500 ls-truncate">
+        @foreach (var agent in DistinctAgents.Take(2))
+        {
+            <span class="flex items-center gap-1 shrink-0">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:@ColorUtils.GetColorForAgent(agent)"></span>
+                @agent
+            </span>
+        }
+        @if (DistinctAgents.Count > 2)
+        {
+            <span class="text-slate-600">+@(DistinctAgents.Count - 2)</span>
+        }
+    </div>
+</button>
+
+@code {
+    [Parameter, EditorRequired]
+    public Conversation Conversation { get; set; } = null!;
+
+    [Parameter]
+    public bool IsSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSelect { get; set; }
+
+    private List<string> DistinctAgents => Conversation.Turns.Select(t => t.Agent).Distinct().ToList();
+
+    private static string FormatTokens(int tokens) => tokens switch
+    {
+        >= 1_000_000 => (tokens / 1_000_000.0).ToString("F1", CultureInfo.InvariantCulture) + "M",
+        >= 1_000 => (tokens / 1_000.0).ToString("F1", CultureInfo.InvariantCulture) + "K",
+        _ => tokens.ToString(CultureInfo.InvariantCulture),
+    };
+}

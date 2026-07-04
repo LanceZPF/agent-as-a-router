@@ -321,6 +321,35 @@ Extend `MockData` class to include a few sample `Conversation` objects, each con
 | `src/AgenticRouter.Gui/Components/TurnCard.razor` | Create | New reusable component for turn list |
 | `src/AgenticRouter.Gui/Components/ConversationSummary.razor` | Create | Pinned summary card component |
 | `src/AgenticRouter.Gui/Models/DashboardData.cs` | Extend | Add `Conversation` and `ConversationTurn` records + mock data |
+| `src/AgenticRouter.Gui/Utils/ColorUtils.cs` | Create | Deterministic agent-name → color mapping |
+| `src/AgenticRouter.Gui/wwwroot/js/split-pane.js` | Create | Pointer-drag handling for the adjustable split panels |
+| `src/AgenticRouter.Gui/wwwroot/css/app.css` | Extend | `ls-*` classes: split divider, metric tiles, truncation, payload areas |
+
+---
+
+## Implemented Revision Decisions (v2)
+
+The first implementation of this plan was rejected and replaced. The current revision departs from
+the earlier attempt (and refines this plan) as follows:
+
+1. **Adjustable split panels**: the left/right panels are separated by a full-height draggable
+   divider (`wwwroot/js/split-pane.js`, invoked from `LiveStream.razor` via JS interop). Left panel
+   defaults to 35% width and is clamped to 20-65% while dragging.
+2. **Metric tiles instead of label/value rows**: turn metrics render as a dense 4-column grid of
+   compact tiles (value over a small uppercase label), keeping many turns visible per screen. The
+   seven tiles keep the business-priority order: ROI, Cost, Tokens P/C, Tool Steps, Cache Hit, TTFT,
+   Ctx Used.
+3. **Minimal iconography**: plain text labels and the existing SVG `Icon` component, matching the
+   rest of the dashboard, rather than emoji markers on every metric.
+4. **Tooltips**: every metric tile (turn-level and conversation-level) carries a native `title`
+   tooltip defining the metric.
+5. **Per-turn fallback flag**: `ConversationTurn` gained an optional `IsFallback` so fallback badges
+   render on individual turn cards, not just at conversation level.
+6. **Stable agent colors**: `ColorUtils` hashes agent names with FNV-1a (not `string.GetHashCode()`,
+   which is randomized per process) so agent colors survive app restarts.
+7. **Pinned-by-layout summary**: the conversation summary card sits above the scrollable turn list
+   (rather than using `position: sticky` inside it), so it can never scroll out of view.
+8. **Consistent mock totals**: conversation-level cost/token totals equal the sum of their turns.
 
 ---
 

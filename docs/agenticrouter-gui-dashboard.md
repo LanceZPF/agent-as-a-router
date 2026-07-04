@@ -78,15 +78,28 @@ flowchart TD
 
 ### Tabs
 
-1. **Live Stream** (`LiveStream.razor`, default tab) - a two-column view:
-   - Left (fixed-width column, 40% of the row): a searchable, scrollable list of routing entries
-     (`MockData.Entries`), newest first. Each card shows session ID, timestamp, routed model, savings,
-     and originating agent; fallback entries get an amber `⚠` badge and border. Search filters by
-     session ID or agent name.
-   - Right: a drilldown for the selected entry - trace ID/agent header, a token volume breakdown
-     (prompt/completion/total counts plus a proportional bar), a cost performance panel (actual cost vs.
-     worst-case cost vs. net savings), and a collapsible "Routing Decision Inspector" showing the
-     step-by-step routing log (`Ok` = green check, `Warn` = amber triangle, `Info` = blue arrow).
+1. **Live Stream** (`LiveStream.razor`, default tab) - a conversation-centric two-panel view. The
+   panels are adjustable split panes: a full-height divider between them can be dragged to resize
+   (pointer handling in `wwwroot/js/split-pane.js`; left panel defaults to 35% width, clamped 20-65%).
+   - Left panel (`ConversationCard.razor`): a searchable, scrollable list of conversations
+     (`MockData.Conversations`). Each card shows the conversation title, first → last turn timestamps,
+     total session cost, total tokens (K/M notation), turn count, and color-dotted names of the first
+     two distinct agents; conversations containing fallback turns get an amber `⚠` badge and left
+     border. Search filters by title, session ID, agent name, or model name.
+   - Right panel, top (`ConversationSummary.razor`): a pinned summary card for the selected
+     conversation that stays visible while the turn list scrolls. Shows title, session ID, time range,
+     a fallback warning badge when applicable, and four aggregate metric tiles - Total Cost, Total
+     Tokens, Avg Routing ROI, and Turn count - each with a hover tooltip explaining the metric.
+   - Right panel, below (`TurnCard.razor`): the scrollable list of the conversation's turns. Each turn
+     card is color-coded by agent via a left border and dot (deterministic per-agent color from
+     `Utils/ColorUtils.cs`), and its header shows agent, turn position (N/M), routed model, timestamp,
+     and a fallback badge when the turn was served by fallback routing. The body is a dense 4-column
+     grid of seven metric tiles ranked by business priority - Routing ROI, Cost, Tokens P/C, Tool
+     Steps, Cache Hit, TTFT, Ctx Used - every tile carrying a tooltip that defines the metric.
+     Prompt-token growth across successive turns makes token compounding (the "hockey stick" curve)
+     visible while scrolling. Clicking the header expands a drill-down: the step-by-step "Routing
+     Decision" log (`Ok` = green check, `Warn` = amber triangle, `Info` = blue arrow) plus a
+     collapsed-by-default "Request / Response" section with scrollable payload previews.
 
 2. **Cost Analytics** (`CostAnalytics.razor`) - two stacked panels:
    - A cumulative savings line chart over time (`MockData.CostData`), with a dark tooltip.
@@ -115,12 +128,19 @@ action is actually wired to real data yet - confirming just closes the modal.
 
 ## Data model (`Models/DashboardData.cs`)
 
-All dashboard state is derived from six mock collections on the static `MockData` class, typed via C#
-records:
+All dashboard state is derived from seven mock collections on the static `MockData` class, typed via
+C# records:
 
+- `MockData.Conversations: Conversation[]` - conversations (sessions) for the Live Stream tab: title,
+  first/last timestamps, aggregate cost/token totals, a fallback flag, and an ordered list of
+  `ConversationTurn`s. Each turn carries the per-turn metrics (prompt/completion tokens, routing ROI,
+  cost, tool execution steps, cache hit rate, TTFT, context buffer %), its `RoutingSteps` log,
+  optional request/response payload previews, and a fallback flag. The mock turns' prompt tokens grow
+  turn-over-turn to demonstrate token compounding.
 - `MockData.Entries: RoutingEntry[]` - individual routing decisions (session/trace IDs, agent, model,
   fallback flag, token counts, actual vs. worst-case cost, savings, timestamp, and an ordered
-  `RoutingSteps` log).
+  `RoutingSteps` log). No longer rendered by the Live Stream tab, but kept as the entry-level
+  telemetry shape for future integration.
 - `MockData.Providers: Provider[]` - per-provider budget state (cap, current spend, estimated days
   remaining).
 - `MockData.CostData: CostDataPoint[]` - cumulative savings time series.

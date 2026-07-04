@@ -49,12 +49,306 @@ public sealed record TokenBucket(string Slot, decimal Prompt, decimal Completion
 /// <summary>Market-share percentage (and display color) for one model.</summary>
 public sealed record ModelShare(string Model, decimal Value, string Color);
 
+/// <summary>A single turn (one multi-step agentic workflow) within a conversation.</summary>
+public sealed record ConversationTurn(
+    string Id,
+    string Agent,
+    string Model,
+    int TurnNumber,
+    int PromptTokens,
+    int CompletionTokens,
+    decimal RoutingRoi,
+    decimal TotalCost,
+    int ToolExecutionSteps,
+    decimal CacheHitRate,
+    int TimeToFirstTokenMs,
+    decimal ContextBufferPercent,
+    string Timestamp,
+    IReadOnlyList<RoutingStep> RoutingSteps,
+    string? RequestSummary = null,
+    string? ResponseSummary = null,
+    bool IsFallback = false);
+
+/// <summary>A conversation (session) whose turns are shown in the Live Stream tab.</summary>
+public sealed record Conversation(
+    string Id,
+    string Title,
+    string FirstTimestamp,
+    string LastTimestamp,
+    decimal TotalCost,
+    int TotalPromptTokens,
+    int TotalCompletionTokens,
+    bool HasFallbackTurns,
+    IReadOnlyList<ConversationTurn> Turns);
+
 /// <summary>
 /// Hard-coded mock data for the dashboard. The dashboard is not yet wired up to the live AgenticRouter
 /// proxy; replacing this class with real telemetry is the intended integration seam.
 /// </summary>
 public static class MockData
 {
+    public static readonly IReadOnlyList<Conversation> Conversations =
+    [
+        new(
+            Id: "sess-001",
+            Title: "Code Review Analysis - PR #4521",
+            FirstTimestamp: "14:15:32",
+            LastTimestamp: "14:22:18",
+            TotalCost: 0.045230m,
+            TotalPromptTokens: 15456,
+            TotalCompletionTokens: 3894,
+            HasFallbackTurns: false,
+            Turns:
+            [
+                new(
+                    Id: "sess-001-t1",
+                    Agent: "Code Review Bot",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 1,
+                    PromptTokens: 2104,
+                    CompletionTokens: 891,
+                    RoutingRoi: 85.01m,
+                    TotalCost: 0.006310m,
+                    ToolExecutionSteps: 2,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 245,
+                    ContextBufferPercent: 26.2m,
+                    Timestamp: "14:15:32",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Ok, "Code diff parsed (214 changed lines)"),
+                        new(StepStatus.Ok, "Anthropic budget nominal; claude-3-haiku selected"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ],
+                    RequestSummary: """{"model":"claude-3-haiku","messages":[{"role":"user","content":"Review the diff for PR #4521 (src/auth/token_service.py, 214 lines)…"}]}""",
+                    ResponseSummary: """{"content":"Found 3 issues: missing null check on refresh_token (L87), unbounded retry loop (L112), token logged in plaintext (L145)…"}"""),
+                new(
+                    Id: "sess-001-t2",
+                    Agent: "Code Review Bot",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 2,
+                    PromptTokens: 3240,
+                    CompletionTokens: 1205,
+                    RoutingRoi: 84.50m,
+                    TotalCost: 0.009870m,
+                    ToolExecutionSteps: 3,
+                    CacheHitRate: 72m,
+                    TimeToFirstTokenMs: 198,
+                    ContextBufferPercent: 40.5m,
+                    Timestamp: "14:17:45",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Ok, "History carried forward (3,240 prompt tokens)"),
+                        new(StepStatus.Ok, "Prompt cache hit: 2,333 tokens read from cache"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ],
+                    RequestSummary: """{"model":"claude-3-haiku","messages":[…2 prior turns…,{"role":"user","content":"Suggest a fix for the unbounded retry loop"}]}""",
+                    ResponseSummary: """{"content":"Replace the while-loop with tenacity retry(stop=stop_after_attempt(3), wait=wait_exponential())…"}"""),
+                new(
+                    Id: "sess-001-t3",
+                    Agent: "Code Review Bot",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 3,
+                    PromptTokens: 4567,
+                    CompletionTokens: 1798,
+                    RoutingRoi: 83.20m,
+                    TotalCost: 0.013820m,
+                    ToolExecutionSteps: 4,
+                    CacheHitRate: 68m,
+                    TimeToFirstTokenMs: 211,
+                    ContextBufferPercent: 57.0m,
+                    Timestamp: "14:19:22",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Ok, "History carried forward (4,567 prompt tokens)"),
+                        new(StepStatus.Warn, "Prompt growth trending up 41% turn-over-turn"),
+                        new(StepStatus.Ok, "Prompt cache hit: 3,106 tokens read from cache"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ],
+                    RequestSummary: """{"model":"claude-3-haiku","messages":[…4 prior turns…,{"role":"user","content":"Apply the same pattern to session_service.py"}]}""",
+                    ResponseSummary: """{"content":"Patched 2 call sites; session_refresh now shares the retry policy. Diff attached…"}"""),
+                new(
+                    Id: "sess-001-t4",
+                    Agent: "Code Review Bot",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 4,
+                    PromptTokens: 5545,
+                    CompletionTokens: 0,
+                    RoutingRoi: 88.75m,
+                    TotalCost: 0.015230m,
+                    ToolExecutionSteps: 1,
+                    CacheHitRate: 75m,
+                    TimeToFirstTokenMs: 189,
+                    ContextBufferPercent: 69.2m,
+                    Timestamp: "14:22:18",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Ok, "Final summary pass (no completion requested)"),
+                        new(StepStatus.Ok, "Prompt cache hit: 4,159 tokens read from cache"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ],
+                    RequestSummary: """{"model":"claude-3-haiku","messages":[…6 prior turns…,{"role":"user","content":"Summarize all applied changes"}]}"""),
+            ]),
+        new(
+            Id: "sess-002",
+            Title: "Data Pipeline Debugging - ETL Job #892",
+            FirstTimestamp: "14:08:15",
+            LastTimestamp: "14:14:42",
+            TotalCost: 0.025450m,
+            TotalPromptTokens: 8932,
+            TotalCompletionTokens: 2456,
+            HasFallbackTurns: false,
+            Turns:
+            [
+                new(
+                    Id: "sess-002-t1",
+                    Agent: "Data Analyst Wrapper",
+                    Model: "gpt-4o-mini",
+                    TurnNumber: 1,
+                    PromptTokens: 1890,
+                    CompletionTokens: 623,
+                    RoutingRoi: 87.56m,
+                    TotalCost: 0.005340m,
+                    ToolExecutionSteps: 2,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 312,
+                    ContextBufferPercent: 23.4m,
+                    Timestamp: "14:08:15",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Ok, "SQL error log parsed (1,234 lines)"),
+                        new(StepStatus.Ok, "Short context: gpt-4o-mini sufficient"),
+                        new(StepStatus.Info, "Route Confirmed: gpt-4o-mini"),
+                    ],
+                    RequestSummary: """{"model":"gpt-4o-mini","messages":[{"role":"user","content":"ETL job #892 failed at stage 3 with ORA-01555. Log excerpt follows…"}]}""",
+                    ResponseSummary: """{"content":"ORA-01555 (snapshot too old): the MERGE reads a table mutated mid-run. Recommend isolating the read with a staging CTAS…"}"""),
+                new(
+                    Id: "sess-002-t2",
+                    Agent: "Data Analyst Wrapper",
+                    Model: "gpt-4o-mini",
+                    TurnNumber: 2,
+                    PromptTokens: 3456,
+                    CompletionTokens: 912,
+                    RoutingRoi: 86.20m,
+                    TotalCost: 0.009870m,
+                    ToolExecutionSteps: 3,
+                    CacheHitRate: 45m,
+                    TimeToFirstTokenMs: 267,
+                    ContextBufferPercent: 42.8m,
+                    Timestamp: "14:10:33",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Ok, "Query execution plan added to context"),
+                        new(StepStatus.Ok, "Prompt cache hit: 1,555 tokens read from cache"),
+                        new(StepStatus.Info, "Route Confirmed: gpt-4o-mini"),
+                    ],
+                    RequestSummary: """{"model":"gpt-4o-mini","messages":[…2 prior turns…,{"role":"user","content":"Here is the EXPLAIN PLAN output for the failing MERGE…"}]}""",
+                    ResponseSummary: """{"content":"The full-table scan on FACT_ORDERS forces a 40-minute read window. Add a partition-pruning predicate on LOAD_DATE…"}"""),
+                new(
+                    Id: "sess-002-t3",
+                    Agent: "Data Analyst Wrapper",
+                    Model: "gpt-4o-mini",
+                    TurnNumber: 3,
+                    PromptTokens: 3586,
+                    CompletionTokens: 921,
+                    RoutingRoi: 85.90m,
+                    TotalCost: 0.010240m,
+                    ToolExecutionSteps: 2,
+                    CacheHitRate: 52m,
+                    TimeToFirstTokenMs: 278,
+                    ContextBufferPercent: 44.3m,
+                    Timestamp: "14:14:42",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Ok, "Fix verification pass (3,586 prompt tokens)"),
+                        new(StepStatus.Ok, "Prompt cache hit: 1,865 tokens read from cache"),
+                        new(StepStatus.Info, "Route Confirmed: gpt-4o-mini"),
+                    ],
+                    RequestSummary: """{"model":"gpt-4o-mini","messages":[…4 prior turns…,{"role":"user","content":"Validate the revised MERGE statement before I schedule the rerun"}]}""",
+                    ResponseSummary: """{"content":"Revised statement is safe: partition pruning cuts the read window to ~90s, well inside undo retention…"}"""),
+            ]),
+        new(
+            Id: "sess-003",
+            Title: "Customer Support - Issue #78234",
+            FirstTimestamp: "13:52:10",
+            LastTimestamp: "14:05:33",
+            TotalCost: 0.004560m,
+            TotalPromptTokens: 6234,
+            TotalCompletionTokens: 1845,
+            HasFallbackTurns: true,
+            Turns:
+            [
+                new(
+                    Id: "sess-003-t1",
+                    Agent: "Customer Support NLP",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 1,
+                    PromptTokens: 1456,
+                    CompletionTokens: 567,
+                    RoutingRoi: 82.30m,
+                    TotalCost: 0.004560m,
+                    ToolExecutionSteps: 1,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 189,
+                    ContextBufferPercent: 18.0m,
+                    Timestamp: "13:52:10",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Ok, "Customer inquiry classified: billing dispute"),
+                        new(StepStatus.Ok, "Anthropic budget nominal; claude-3-haiku selected"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ],
+                    RequestSummary: """{"model":"claude-3-haiku","messages":[{"role":"user","content":"Ticket #78234: customer charged twice for the June invoice…"}]}""",
+                    ResponseSummary: """{"content":"Duplicate charge confirmed against payment records. Draft refund response prepared for agent review…"}"""),
+                new(
+                    Id: "sess-003-t2",
+                    Agent: "Customer Support NLP",
+                    Model: "fallback-cheapest-local",
+                    TurnNumber: 2,
+                    PromptTokens: 2389,
+                    CompletionTokens: 734,
+                    RoutingRoi: 0m,
+                    TotalCost: 0.000000m,
+                    ToolExecutionSteps: 2,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 445,
+                    ContextBufferPercent: 29.5m,
+                    Timestamp: "13:54:28",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Warn, "Anthropic hourly budget breached; routing restricted"),
+                        new(StepStatus.Ok, "Fallback routing activated: local model"),
+                        new(StepStatus.Info, "Route Confirmed: fallback-cheapest-local"),
+                    ],
+                    RequestSummary: """{"model":"fallback-cheapest-local","messages":[…2 prior turns…,{"role":"user","content":"Customer replied asking about the refund timeline"}]}""",
+                    ResponseSummary: """{"content":"Refunds post within 5-7 business days of approval. Suggested reply drafted…"}""",
+                    IsFallback: true),
+                new(
+                    Id: "sess-003-t3",
+                    Agent: "Customer Support NLP",
+                    Model: "fallback-cheapest-local",
+                    TurnNumber: 3,
+                    PromptTokens: 2389,
+                    CompletionTokens: 544,
+                    RoutingRoi: 0m,
+                    TotalCost: 0.000000m,
+                    ToolExecutionSteps: 1,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 512,
+                    ContextBufferPercent: 29.5m,
+                    Timestamp: "14:05:33",
+                    RoutingSteps:
+                    [
+                        new(StepStatus.Warn, "Anthropic budget still breached; staying on fallback"),
+                        new(StepStatus.Ok, "Local model serving request"),
+                        new(StepStatus.Info, "Route Confirmed: fallback-cheapest-local"),
+                    ],
+                    RequestSummary: """{"model":"fallback-cheapest-local","messages":[…4 prior turns…,{"role":"user","content":"Close out the ticket with a resolution summary"}]}""",
+                    ResponseSummary: """{"content":"Ticket #78234 resolved: duplicate June charge refunded, confirmation email queued…"}""",
+                    IsFallback: true),
+            ]),
+    ];
+
     public static readonly IReadOnlyList<RoutingEntry> Entries =
     [
         new(
