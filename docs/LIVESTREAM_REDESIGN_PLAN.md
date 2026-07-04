@@ -34,23 +34,27 @@ This is a live dashboard that auto-refreshes as conversations progress in real-t
 
 ### Overall Structure: **Three-Section Layout**
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ [🤖 Router Optimization Engine]                    [⚙️ Settings]│
-├─────────────────────┬─────────────────────────────────────────────┤
-│                     │ 📊 Ticker Row:                              │
-│  Left Panel         │ [$142.36 saved] [12.4M tokens] [74.2% ROI]  │
-│  (Conversations)    │                                              │
-│                     ├─────────────────────────────────────────────┤
-│                     │ 📌 PINNED: Conversation Summary Card (top)  │
-│  • Search bar       │    Title | Cost | Tokens | Turns | Warnings│
-│  • Conversation     ├─────────────────────────────────────────────┤
-│    cards (scrollable)│ 📋 Turn List (scrollable):                  │
-│                     │   [Turn 1] [Turn 2] [Turn 3] ...            │
-│                     │   Each: Color-coded badge + metrics          │
-│                     │   Expandable for details                     │
-│                     │                                              │
-└─────────────────────┴─────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Header["🤖 Router Optimization Engine — Settings"]
+    Ticker["📊 Ticker Row: $142.36 saved · 12.4M tokens · 74.2% ROI"]
+    Header --> Ticker
+
+    subgraph Left["Left Panel — Conversations"]
+        Search["🔍 Search bar"]
+        Cards["Conversation cards (scrollable)"]
+        Search --> Cards
+    end
+
+    subgraph Right["Right Panel — Details"]
+        Pinned["📌 Pinned Conversation Summary Card"]
+        TurnList["📋 Turn List (scrollable)\nColor-coded badge + metrics, expandable"]
+        Pinned --> TurnList
+    end
+
+    Ticker --> Left
+    Ticker --> Right
+    Cards -. selection .-> Pinned
 ```
 
 ---
@@ -69,16 +73,13 @@ Each card is a button that selects the conversation. Styling:
 - **Fallback warning**: Orange left border + warning badge if any turn in session had fallback routing
 
 **Card Content** (top to bottom):
-```
-┌─────────────────────────────────────────┐
-│ 🏷️  Session Title                    📍 │ ← Title + Badge (if warning)
-├─────────────────────────────────────────┤
-│ 📅 Jun 25, 14:32:01 → Jun 25, 14:35:18 │ ← First & last turn timestamps
-├─────────────────────────────────────────┤
-│ 💰 $0.045230  |  📦 8,234 tokens       │ ← Total session cost & token count
-├─────────────────────────────────────────┤
-│ 🔄 7 turns  |  📊 Agents: Data Ana...  │ ← Turn count & agent pool summary
-└─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Title["🏷️ Session Title  📍 warning badge (if any)"]
+    Time["📅 First timestamp → Last timestamp"]
+    Cost["💰 Total cost  ·  📦 Total tokens"]
+    Turns["🔄 Turn count  ·  📊 Agent pool summary"]
+    Title --> Time --> Cost --> Turns
 ```
 
 **Interaction**:
@@ -94,15 +95,12 @@ Each card is a button that selects the conversation. Styling:
 Sticky card that remains visible when scrolling through turns below.
 
 **Layout** (horizontal grid):
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ Session: e89a2bc... [⚠️ Fallback Alert]  📍 Time: 14:32-14:35  │
-├─────────────────────────────────────────────────────────────────┤
-│ [💰 Total Cost]  [📊 Total Tokens]  [🎯 Avg ROI]  [🔄 Turns]   │
-│   $0.0452         12,456 T             82.3% ↓      7 steps    │
-├─────────────────────────────────────────────────────────────────┤
-│ ℹ️ Tooltip: "Aggregate metrics for this entire conversation"  │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Header["Session: e89a2bc… · ⚠️ Fallback Alert (if any) · Time: 14:32–14:35"]
+    Metrics["💰 Total Cost $0.0452  ·  📊 Total Tokens 12,456 T  ·  🎯 Avg ROI 82.3% ↓  ·  🔄 Turns 7"]
+    Tip["ℹ️ Tooltip: aggregate metrics for this entire conversation"]
+    Header --> Metrics --> Tip
 ```
 
 **Metrics Displayed**:
@@ -126,18 +124,17 @@ Each turn is a collapsible card showing metrics first, with expandable request/r
 
 #### Turn Card (Collapsed View - Default)
 
-```
-┌─ [🟢 Data Analyst Agent] ──────────────────────────────────────┐
-│  Turn 3/7  |  14:34:15  |  ▼ (expand/collapse)                 │
-├────────────────────────────────────────────────────────────────┤
-│ Routing ROI:        85.2% ↓ 🎯                                  │
-│ Total Cost:         $0.00618  💰                                │
-│ Token Volume:       3,456 P  |  891 C                           │
-│ Tool Steps:         4 loops                                     │
-│ Cache Hit Rate:     72% (2,478 tokens)                          │
-│ TTFT:               245ms  ⏱️                                    │
-│ Context Buffer:     64% (52K / 81K used)                        │
-└────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Head["🟢 Data Analyst Agent · Turn 3/7 · 14:34:15 · ▼ expand/collapse"]
+    ROI["🎯 Routing ROI: 85.2% ↓"]
+    Cost["💰 Total Cost: $0.00618"]
+    Tokens["📊 Token Volume: 3,456 P | 891 C"]
+    Steps["🔧 Tool Steps: 4 loops"]
+    Cache["💾 Cache Hit Rate: 72% (2,478 tokens)"]
+    Ttft["⏱️ TTFT: 245ms"]
+    Buffer["📋 Context Buffer: 64% (52K / 81K used)"]
+    Head --> ROI --> Cost --> Tokens --> Steps --> Cache --> Ttft --> Buffer
 ```
 
 **Color Coding**:
@@ -161,24 +158,13 @@ Each turn is a collapsible card showing metrics first, with expandable request/r
 
 When expanded, the turn card shows additional sections:
 
-```
-┌─ [🟢 Data Analyst Agent] ──────────────────────────────────────┐
-│  Turn 3/7  |  14:34:15  |  ▲ (collapse)                        │
-├────────────────────────────────────────────────────────────────┤
-│ [Metrics Section - Same as above]                               │
-├────────────────────────────────────────────────────────────────┤
-│ 📋 Routing Decision Inspector:                                 │
-│  ✅ Input contains code telemetry                              │
-│  ✅ Budget nominal: gpt-4o-mini selected                       │
-│  ✅ Context window validated (3,456 tokens)                    │
-│  ℹ️  Route Confirmed: gpt-4o-mini                              │
-├────────────────────────────────────────────────────────────────┤
-│ 🔽 Request/Response (Collapsed by Default)                      │
-│    └─ [Show Request] [Show Response]  (expandable sections)    │
-│       • Request payload truncated summary                      │
-│       • Response payload truncated summary                     │
-│       (Full JSON available in collapse/expand)                 │
-└────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Head["🟢 Data Analyst Agent · Turn 3/7 · 14:34:15 · ▲ collapse"]
+    Metrics["Metrics Section (same as collapsed view)"]
+    Inspector["📋 Routing Decision Inspector\n✅ Input contains code telemetry\n✅ Budget nominal: gpt-4o-mini selected\n✅ Context window validated (3,456 tokens)\nℹ️ Route Confirmed: gpt-4o-mini"]
+    ReqResp["🔽 Request/Response (collapsed by default)\nShow Request | Show Response — truncated summaries,\nfull JSON available on expand"]
+    Head --> Metrics --> Inspector --> ReqResp
 ```
 
 **Sections**:

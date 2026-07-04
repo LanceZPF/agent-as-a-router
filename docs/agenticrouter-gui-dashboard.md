@@ -79,9 +79,10 @@ flowchart TD
 ### Tabs
 
 1. **Live Stream** (`LiveStream.razor`, default tab) - a two-column view:
-   - Left (resizable Panels / Split Panes with a draggable boundary - 40% width by default): a searchable, scrollable list of routing entries (`MockData.Entries`), newest
-     first. Each card shows session ID, timestamp, routed model, savings, and originating agent; fallback
-     entries get an amber `⚠` badge and border. Search filters by session ID or agent name.
+   - Left (fixed-width column, 40% of the row): a searchable, scrollable list of routing entries
+     (`MockData.Entries`), newest first. Each card shows session ID, timestamp, routed model, savings,
+     and originating agent; fallback entries get an amber `⚠` badge and border. Search filters by
+     session ID or agent name.
    - Right: a drilldown for the selected entry - trace ID/agent header, a token volume breakdown
      (prompt/completion/total counts plus a proportional bar), a cost performance panel (actual cost vs.
      worst-case cost vs. net savings), and a collapsible "Routing Decision Inspector" showing the
