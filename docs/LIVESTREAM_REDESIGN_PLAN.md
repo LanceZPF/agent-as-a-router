@@ -335,14 +335,16 @@ the earlier attempt (and refines this plan) as follows:
 1. **Adjustable split panels**: the left/right panels are separated by a full-height draggable
    divider (`wwwroot/js/split-pane.js`, invoked from `LiveStream.razor` via JS interop). Left panel
    defaults to 35% width and is clamped to 20-65% while dragging.
-2. **Metric tiles instead of label/value rows**: turn metrics render as a dense 4-column grid of
-   compact tiles (value over a small uppercase label), keeping many turns visible per screen. The
-   seven tiles keep the business-priority order: ROI, Cost, Tokens P/C, Tool Steps, Cache Hit, TTFT,
-   Ctx Used.
+2. **Compact two-line turn cards**: each collapsed turn card is a header line plus a single
+   wrapping stat strip (small uppercase label + value pairs) in business-priority order - ROI, Cost,
+   Tok P/C, Steps, Cache, TTFT, Ctx, Model - so many turns fit on screen at once. An earlier tile
+   grid was rejected as too tall.
 3. **Minimal iconography**: plain text labels and the existing SVG `Icon` component, matching the
    rest of the dashboard, rather than emoji markers on every metric.
-4. **Tooltips**: every metric tile (turn-level and conversation-level) carries a native `title`
-   tooltip defining the metric.
+4. **Floating tooltips**: every metric (turn-level, summary, and conversation-card) carries a
+   `data-tip` attribute rendered by a body-level floating tooltip (`wwwroot/js/tooltips.js`).
+   Native `title` tooltips proved unreliable in the BlazorWebView and CSS-only tooltips get clipped
+   by the internal scroll containers.
 5. **Per-turn fallback flag**: `ConversationTurn` gained an optional `IsFallback` so fallback badges
    render on individual turn cards, not just at conversation level.
 6. **Stable agent colors**: `ColorUtils` hashes agent names with FNV-1a (not `string.GetHashCode()`,
@@ -350,6 +352,14 @@ the earlier attempt (and refines this plan) as follows:
 7. **Pinned-by-layout summary**: the conversation summary card sits above the scrollable turn list
    (rather than using `position: sticky` inside it), so it can never scroll out of view.
 8. **Consistent mock totals**: conversation-level cost/token totals equal the sum of their turns.
+9. **Request excerpt as turn title**: the first words of the turn's request text serve as the turn
+   card title, so scanning the list reads like the conversation itself. Request/response mock data
+   is plain sample text (not JSON payloads), shown directly in the expanded drill-down without a
+   second collapse level.
+10. **Agent-tinted cards**: each turn card's background and left border are tinted with the selected
+    agent's color, and the header carries a color-coded agent chip - reusing the tinted-row visual
+    language of the original Routing Decision Inspector to make the selected agent obvious at a
+    glance.
 
 ---
 

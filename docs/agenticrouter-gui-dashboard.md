@@ -86,20 +86,25 @@ flowchart TD
      total session cost, total tokens (K/M notation), turn count, and color-dotted names of the first
      two distinct agents; conversations containing fallback turns get an amber `⚠` badge and left
      border. Search filters by title, session ID, agent name, or model name.
-   - Right panel, top (`ConversationSummary.razor`): a pinned summary card for the selected
-     conversation that stays visible while the turn list scrolls. Shows title, session ID, time range,
-     a fallback warning badge when applicable, and four aggregate metric tiles - Total Cost, Total
-     Tokens, Avg Routing ROI, and Turn count - each with a hover tooltip explaining the metric.
-   - Right panel, below (`TurnCard.razor`): the scrollable list of the conversation's turns. Each turn
-     card is color-coded by agent via a left border and dot (deterministic per-agent color from
-     `Utils/ColorUtils.cs`), and its header shows agent, turn position (N/M), routed model, timestamp,
-     and a fallback badge when the turn was served by fallback routing. The body is a dense 4-column
-     grid of seven metric tiles ranked by business priority - Routing ROI, Cost, Tokens P/C, Tool
-     Steps, Cache Hit, TTFT, Ctx Used - every tile carrying a tooltip that defines the metric.
-     Prompt-token growth across successive turns makes token compounding (the "hockey stick" curve)
-     visible while scrolling. Clicking the header expands a drill-down: the step-by-step "Routing
-     Decision" log (`Ok` = green check, `Warn` = amber triangle, `Info` = blue arrow) plus a
-     collapsed-by-default "Request / Response" section with scrollable payload previews.
+   - Right panel, top (`ConversationSummary.razor`): a compact pinned summary card for the selected
+     conversation that stays visible while the turn list scrolls. A title row (title, fallback badge
+     when applicable, session ID + time range) above a one-line stat strip - Total Cost, Total Tokens,
+     Avg ROI, Turns - each stat with a tooltip explaining the metric.
+   - Right panel, below (`TurnCard.razor`): the scrollable list of the conversation's turns as compact
+     two-line cards, so many turns fit on screen. Each card's background and left border are tinted
+     with the selected agent's color (deterministic per-agent color from `Utils/ColorUtils.cs`, the
+     same tinted-row visual language as the routing decision log). The header line shows the turn
+     position (N/M), the first words of the turn's request text as the card title, a color-coded agent
+     chip naming the agent the router selected, a fallback badge when applicable, and the timestamp.
+     The second line is a wrapping stat strip ranked by business priority - ROI, Cost, Tok P/C, Steps,
+     Cache, TTFT, Ctx, Model - every stat carrying a tooltip that defines the metric. Prompt-token
+     growth across successive turns makes token compounding (the "hockey stick" curve) visible while
+     scrolling. Clicking the header expands a drill-down: the step-by-step "Routing Decision" log with
+     color-coded row backgrounds (`Ok` = green, `Warn` = amber, `Info` = blue) plus the turn's request
+     and response text in scrollable blocks.
+   - Tooltips: metric tooltips across the tab are floating tooltips driven by `data-tip` attributes
+     (`wwwroot/js/tooltips.js`, a single body-level element) rather than native `title` attributes,
+     so they render reliably inside the BlazorWebView and are never clipped by scroll containers.
 
 2. **Cost Analytics** (`CostAnalytics.razor`) - two stacked panels:
    - A cumulative savings line chart over time (`MockData.CostData`), with a dark tooltip.
@@ -135,8 +140,9 @@ C# records:
   first/last timestamps, aggregate cost/token totals, a fallback flag, and an ordered list of
   `ConversationTurn`s. Each turn carries the per-turn metrics (prompt/completion tokens, routing ROI,
   cost, tool execution steps, cache hit rate, TTFT, context buffer %), its `RoutingSteps` log,
-  optional request/response payload previews, and a fallback flag. The mock turns' prompt tokens grow
-  turn-over-turn to demonstrate token compounding.
+  optional plain-text request/response excerpts (the request excerpt doubles as the turn card title),
+  and a fallback flag. The mock turns' prompt tokens grow turn-over-turn to demonstrate token
+  compounding.
 - `MockData.Entries: RoutingEntry[]` - individual routing decisions (session/trace IDs, agent, model,
   fallback flag, token counts, actual vs. worst-case cost, savings, timestamp, and an ordered
   `RoutingSteps` log). No longer rendered by the Live Stream tab, but kept as the entry-level

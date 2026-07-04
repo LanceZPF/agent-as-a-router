@@ -90,32 +90,35 @@
   background: #475569;
 }
 
-/* Dense grid of per-turn metric tiles. */
-.ls-metric-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.375rem;
-}
-
-/* One metric tile: value on top, label below, tooltip on the tile itself. */
-.ls-tile {
-  background: #0f172a;
-  border-radius: 0.25rem;
-  padding: 0.375rem 0.5rem;
-  text-align: center;
-  cursor: help;
-  min-width: 0;
-}
-
-.ls-tile-label {
-  margin-top: 2px;
+/* Small uppercase label preceding a stat value in the per-turn / summary stat strips. */
+.ls-stat-label {
   font-size: 10px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #64748b;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+/* Elements with a data-tip attribute get a floating tooltip (js/tooltips.js). */
+.ls-tip {
+  cursor: help;
+}
+
+/* The single body-level tooltip element created by js/tooltips.js. */
+.ls-tooltip {
+  position: fixed;
+  z-index: 100;
+  max-width: 280px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #cbd5e1;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 /* Single-line ellipsis (the compiled sheet has no .truncate). min-width:0 lets flex

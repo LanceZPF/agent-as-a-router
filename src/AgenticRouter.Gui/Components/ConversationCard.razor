@@ -10,29 +10,29 @@
         <span class="text-xs font-semibold text-slate-200 ls-truncate">@Conversation.Title</span>
         @if (Conversation.HasFallbackTurns)
         {
-            <span class="ml-auto shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold"
+            <span class="ml-auto shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold ls-tip"
                   style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44"
-                  title="One or more turns in this conversation used fallback routing">⚠</span>
+                  data-tip="One or more turns in this conversation used fallback routing">⚠</span>
         }
     </div>
 
     @* First → last turn timestamps *@
-    <div class="text-xs font-mono text-slate-500 mb-1"
-         title="Timestamps of the first and last turn in this conversation">
+    <div class="text-xs font-mono text-slate-500 mb-1 ls-tip"
+         data-tip="Timestamps of the first and last turn in this conversation">
         @Conversation.FirstTimestamp <span class="text-slate-600">→</span> @Conversation.LastTimestamp
     </div>
 
     @* Cost · tokens · turns *@
     <div class="flex items-center gap-2 text-xs font-mono">
-        <span style="color:#10b981" title="Total LLM API cost across all turns in this conversation">
+        <span class="ls-tip" style="color:#10b981" data-tip="Total LLM API cost across all turns in this conversation">
             $@Conversation.TotalCost.ToString("F6", CultureInfo.InvariantCulture)
         </span>
         <span class="text-slate-600">·</span>
-        <span class="text-slate-300" title="Total prompt + completion tokens across all turns">
+        <span class="text-slate-300 ls-tip" data-tip="Total prompt + completion tokens across all turns">
             @FormatTokens(Conversation.TotalPromptTokens + Conversation.TotalCompletionTokens) tok
         </span>
         <span class="text-slate-600">·</span>
-        <span class="text-slate-400" title="Number of turns (multi-step agent workflows) in this conversation">
+        <span class="text-slate-400 ls-tip" data-tip="Number of turns (multi-step agent workflows) in this conversation">
             @Conversation.Turns.Count @(Conversation.Turns.Count == 1 ? "turn" : "turns")
         </span>
     </div>

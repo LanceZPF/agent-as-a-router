@@ -1,70 +1,83 @@
-@* One turn (multi-step agent workflow) in the Live Stream turn list. The left border is
-   color-coded by the agent the router selected; metrics render as a dense tile grid, and the
-   header toggles a drill-down (routing decision log + request/response payloads). *@
+@* One turn (multi-step agent workflow) in the Live Stream turn list. Compact two-line card:
+   header (request excerpt as title + agent chip) and a single wrapping stat strip, so many turns
+   fit on screen. The card background and left border are tinted with the selected agent's color
+   (same visual language as the routing-decision rows in the drill-down). Clicking the header
+   expands the routing decision log and the request/response text. Metric tooltips are floating
+   data-tip tooltips (wwwroot/js/tooltips.js). *@
 <div class="rounded"
-     style="background:#1e293b;
-            border:1px solid #334155;
-            border-left:3px solid @AgentColor">
-    @* Header: agent · turn position · model · timestamp · expand toggle *@
+     style="background:@(AgentColor)10;border:1px solid #334155;border-left:3px solid @AgentColor">
+    @* Header: turn number · request excerpt · agent chip · timestamp · expand toggle *@
     <button @onclick="() => _expanded = !_expanded"
-            class="w-full flex items-center gap-2 px-3 py-2 text-left card-hover rounded"
+            class="w-full flex items-center gap-2 px-2.5 pt-1.5 text-left"
             style="background:transparent">
-        <span class="w-2 h-2 rounded-full shrink-0" style="background:@AgentColor"></span>
-        <span class="text-xs font-semibold text-slate-200 shrink-0">@Turn.Agent</span>
-        <span class="text-xs font-mono text-slate-500 shrink-0">Turn @Turn.TurnNumber/@TotalTurns</span>
-        <span class="text-xs font-mono ls-truncate" style="color:@(Turn.IsFallback ? "#f59e0b" : "#38bdf8")">@Turn.Model</span>
+        <span class="text-xs font-mono text-slate-500 shrink-0 ls-tip"
+              data-tip="Turn position within this conversation">@Turn.TurnNumber/@TotalTurns</span>
+        <span class="text-xs font-medium text-slate-200 ls-truncate" style="flex:1 1 auto">@TitleExcerpt</span>
+        <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold ls-tip"
+              data-tip="Agent the router selected for this turn"
+              style="background:@(AgentColor)22;color:@AgentColor;border:1px solid @(AgentColor)44">@Turn.Agent</span>
         @if (Turn.IsFallback)
         {
-            <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold"
-                  style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44"
-                  title="This turn was served by fallback routing">⚠</span>
+            <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold ls-tip"
+                  data-tip="This turn was served by fallback routing"
+                  style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">⚠</span>
         }
-        <span class="ml-auto text-xs font-mono text-slate-600 shrink-0">@Turn.Timestamp</span>
+        <span class="text-xs font-mono text-slate-600 shrink-0">@Turn.Timestamp</span>
         <span class="text-xs text-slate-500 shrink-0">@(_expanded ? "▴" : "▾")</span>
     </button>
 
-    @* Metric tiles, ranked by business priority (ROI → cost → tokens → steps → cache → TTFT → context) *@
-    <div class="ls-metric-grid px-3 pb-2">
-        <div class="ls-tile" title="Routing ROI: cost reduction from routing this task to a cheaper model vs. the worst-case expensive model">
-            <div class="font-mono text-xs" style="color:@(Turn.RoutingRoi > 0 ? "#10b981" : "#64748b")">
+    @* Stat strip, ranked by business priority (ROI → cost → tokens → steps → cache → TTFT → context) *@
+    <div class="flex flex-wrap items-baseline px-2.5 pb-1.5 pt-1" style="gap:2px 14px">
+        <span class="flex items-baseline gap-1 ls-tip"
+              data-tip="Routing ROI: cost reduction from routing this task to a cheaper model vs. the worst-case expensive model">
+            <span class="ls-stat-label">ROI</span>
+            <span class="font-mono text-xs" style="color:@(Turn.RoutingRoi > 0 ? "#10b981" : "#64748b")">
                 @(Turn.RoutingRoi > 0 ? $"{Turn.RoutingRoi.ToString("F1", CultureInfo.InvariantCulture)}% ↓" : "—")
-            </div>
-            <div class="ls-tile-label">ROI</div>
-        </div>
-        <div class="ls-tile" title="Total turn cost: prompt token cost + completion token cost for this turn">
-            <div class="font-mono text-xs" style="color:#38bdf8">$@Turn.TotalCost.ToString("F6", CultureInfo.InvariantCulture)</div>
-            <div class="ls-tile-label">Cost</div>
-        </div>
-        <div class="ls-tile" title="Token volume: prompt tokens sent to the LLM / completion tokens generated. Watch prompt tokens compound turn-over-turn (the hockey stick curve).">
-            <div class="font-mono text-xs" style="color:#a78bfa">
-                @Turn.PromptTokens.ToString("N0", CultureInfo.InvariantCulture)<span class="text-slate-600"> / </span>@Turn.CompletionTokens.ToString("N0", CultureInfo.InvariantCulture)
-            </div>
-            <div class="ls-tile-label">Tokens P / C</div>
-        </div>
-        <div class="ls-tile" title="Tool execution steps: number of tool invocations/API calls within this turn's multi-step workflow">
-            <div class="font-mono text-xs" style="color:#f59e0b">@Turn.ToolExecutionSteps</div>
-            <div class="ls-tile-label">Tool Steps</div>
-        </div>
-        <div class="ls-tile" title="Cache hit rate: percentage of prompt tokens served from the provider's prompt cache instead of being processed from scratch">
-            <div class="font-mono text-xs" style="color:@(Turn.CacheHitRate > 0 ? "#10b981" : "#64748b")">
+            </span>
+        </span>
+        <span class="flex items-baseline gap-1 ls-tip"
+              data-tip="Total turn cost: prompt token cost + completion token cost for this turn">
+            <span class="ls-stat-label">Cost</span>
+            <span class="font-mono text-xs" style="color:#38bdf8">$@Turn.TotalCost.ToString("F6", CultureInfo.InvariantCulture)</span>
+        </span>
+        <span class="flex items-baseline gap-1 ls-tip"
+              data-tip="Token volume: prompt tokens sent to the LLM / completion tokens generated. Watch prompt tokens compound turn-over-turn (the hockey stick curve).">
+            <span class="ls-stat-label">Tok P/C</span>
+            <span class="font-mono text-xs" style="color:#a78bfa">@Turn.PromptTokens.ToString("N0", CultureInfo.InvariantCulture)<span class="text-slate-600">/</span>@Turn.CompletionTokens.ToString("N0", CultureInfo.InvariantCulture)</span>
+        </span>
+        <span class="flex items-baseline gap-1 ls-tip"
+              data-tip="Tool execution steps: number of tool invocations/API calls within this turn's multi-step workflow">
+            <span class="ls-stat-label">Steps</span>
+            <span class="font-mono text-xs" style="color:#f59e0b">@Turn.ToolExecutionSteps</span>
+        </span>
+        <span class="flex items-baseline gap-1 ls-tip"
+              data-tip="Cache hit rate: percentage of prompt tokens served from the provider's prompt cache instead of being processed from scratch">
+            <span class="ls-stat-label">Cache</span>
+            <span class="font-mono text-xs" style="color:@(Turn.CacheHitRate > 0 ? "#10b981" : "#64748b")">
                 @(Turn.CacheHitRate > 0 ? $"{Turn.CacheHitRate.ToString("F0", CultureInfo.InvariantCulture)}%" : "—")
-            </div>
-            <div class="ls-tile-label">Cache Hit</div>
-        </div>
-        <div class="ls-tile" title="Time to first token: time elapsed from the routing decision to the first token received from the LLM">
-            <div class="font-mono text-xs" style="color:#fb7185">@Turn.TimeToFirstTokenMs ms</div>
-            <div class="ls-tile-label">TTFT</div>
-        </div>
-        <div class="ls-tile" title="Context buffer: current session context size relative to the model's maximum context window">
-            <div class="font-mono text-xs text-slate-300">@Turn.ContextBufferPercent.ToString("F1", CultureInfo.InvariantCulture)%</div>
-            <div class="ls-tile-label">Ctx Used</div>
-        </div>
+            </span>
+        </span>
+        <span class="flex items-baseline gap-1 ls-tip"
+              data-tip="Time to first token: time elapsed from the routing decision to the first token received from the LLM">
+            <span class="ls-stat-label">TTFT</span>
+            <span class="font-mono text-xs" style="color:#fb7185">@Turn.TimeToFirstTokenMs ms</span>
+        </span>
+        <span class="flex items-baseline gap-1 ls-tip"
+              data-tip="Context buffer: current session context size relative to the model's maximum context window">
+            <span class="ls-stat-label">Ctx</span>
+            <span class="font-mono text-xs text-slate-300">@Turn.ContextBufferPercent.ToString("F1", CultureInfo.InvariantCulture)%</span>
+        </span>
+        <span class="flex items-baseline gap-1 ls-tip"
+              data-tip="Model the router selected for this turn">
+            <span class="ls-stat-label">Model</span>
+            <span class="font-mono text-xs" style="color:@(Turn.IsFallback ? "#f59e0b" : "#38bdf8")">@Turn.Model</span>
+        </span>
     </div>
 
     @if (_expanded)
     {
-        <div class="px-3 pb-3 space-y-2" style="border-top:1px solid #33415580;padding-top:8px">
-            @* Routing decision inspector *@
+        <div class="px-2.5 pb-2.5 space-y-2" style="border-top:1px solid #33415580;padding-top:8px">
+            @* Routing decision log, color-coded by step status *@
             <div class="space-y-1.5">
                 <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Routing Decision</div>
                 @foreach (var step in Turn.RoutingSteps)
@@ -96,37 +109,21 @@
                 }
             </div>
 
-            @* Request / response payloads, collapsed by default *@
-            @if (Turn.RequestSummary is not null || Turn.ResponseSummary is not null)
+            @* Request / response text *@
+            @if (Turn.RequestSummary is not null)
             {
-                <div class="rounded" style="background:#0f172a;border:1px solid #33415580">
-                    <button @onclick="() => _showPayloads = !_showPayloads"
-                            class="w-full flex items-center justify-between px-2 py-1.5 text-left"
-                            style="background:transparent">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Request / Response</span>
-                        <span class="text-xs text-slate-500">@(_showPayloads ? "▴" : "▾")</span>
-                    </button>
-                    @if (_showPayloads)
-                    {
-                        <div class="px-2 pb-2 space-y-1.5">
-                            @if (Turn.RequestSummary is not null)
-                            {
-                                <div>
-                                    <div class="text-xs text-slate-500 mb-1">Request</div>
-                                    <pre class="ls-payload rounded p-2 text-xs font-mono"
-                                         style="background:#020617;color:#cbd5e1;white-space:pre-wrap;word-break:break-all">@Turn.RequestSummary</pre>
-                                </div>
-                            }
-                            @if (Turn.ResponseSummary is not null)
-                            {
-                                <div>
-                                    <div class="text-xs text-slate-500 mb-1">Response</div>
-                                    <pre class="ls-payload rounded p-2 text-xs font-mono"
-                                         style="background:#020617;color:#cbd5e1;white-space:pre-wrap;word-break:break-all">@Turn.ResponseSummary</pre>
-                                </div>
-                            }
-                        </div>
-                    }
+                <div>
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Request</div>
+                    <pre class="ls-payload rounded p-2 text-xs font-mono"
+                         style="background:#020617;color:#cbd5e1;white-space:pre-wrap;word-break:break-word">@Turn.RequestSummary</pre>
+                </div>
+            }
+            @if (Turn.ResponseSummary is not null)
+            {
+                <div>
+                    <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Response</div>
+                    <pre class="ls-payload rounded p-2 text-xs font-mono"
+                         style="background:#020617;color:#cbd5e1;white-space:pre-wrap;word-break:break-word">@Turn.ResponseSummary</pre>
                 </div>
             }
         </div>
@@ -141,7 +138,21 @@
     public int TotalTurns { get; set; }
 
     private bool _expanded;
-    private bool _showPayloads;
 
     private string AgentColor => ColorUtils.GetColorForAgent(Turn.Agent);
+
+    // First few words of the turn's request text, used as the card title.
+    private string TitleExcerpt
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Turn.RequestSummary))
+            {
+                return $"Turn {Turn.TurnNumber}";
+            }
+
+            var words = Turn.RequestSummary.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return words.Length <= 8 ? Turn.RequestSummary : string.Join(' ', words.Take(8)) + "…";
+        }
+    }
 }
