@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.80" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="10.0.80" />
     <!-- Charts: Blazor wrapper for ApexCharts.js. The MAUI flavor registers the chart service via
          AddApexChartsMaui() and bundles its JS as static web assets, so it works offline in the
          BlazorWebView. -->
