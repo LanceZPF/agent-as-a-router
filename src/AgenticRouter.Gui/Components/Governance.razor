@@ -1,0 +1,116 @@
+@* Governance tab: per-provider budget cards sorted by utilization, highest first. *@
+<div class="h-full overflow-y-auto pr-1">
+    <div class="grid grid-cols-2 gap-3" style="grid-auto-rows:min-content">
+        @foreach (var provider in Sorted)
+        {
+            var pct = Math.Min(provider.CurrentSpend / provider.BudgetCap * 100, 100);
+            var isBreached = pct >= 100;
+            var isApproaching = pct is >= 80 and < 100;
+            var borderColor = isBreached ? "#ef4444" : isApproaching ? "#f59e0b" : "#334155";
+            var barColor = isBreached ? "#ef4444" : isApproaching ? "#f59e0b" : "#10b981";
+            var flashClass = FlashId == provider.Id ? (isBreached ? "flash-red" : "flash-amber") : string.Empty;
+
+            <div @key="provider.Id"
+                 class="rounded-lg p-3 flex flex-col gap-2.5 @flashClass"
+                 style="background:#1e293b;border:1px solid @borderColor;transition:border-color 0.3s">
+                @* Header *@
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <div class="text-sm font-semibold text-slate-200 leading-tight">@provider.Name</div>
+                        <div class="text-xs text-slate-500 mt-0.5">@provider.Label</div>
+                    </div>
+                    @if (isBreached)
+                    {
+                        <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold"
+                              style="background:#ef444422;color:#ef4444;border:1px solid #ef444444">CRITICAL</span>
+                    }
+                    else if (isApproaching)
+                    {
+                        <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold"
+                              style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">WARNING</span>
+                    }
+                    else
+                    {
+                        <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold"
+                              style="background:#10b98122;color:#10b981;border:1px solid #10b98144">OK</span>
+                    }
+                </div>
+
+                @* Budget cap input (client-side only; not persisted anywhere yet) *@
+                <div>
+                    <div class="text-xs text-slate-500 mb-1">Budget Cap</div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-xs font-mono text-slate-400">$</span>
+                        <input type="text"
+                               value="@_caps[provider.Id]"
+                               @oninput="e => _caps[provider.Id] = (string?)e.Value ?? string.Empty"
+                               class="rounded px-2 py-1.5 text-xs font-mono w-full"
+                               style="background:#0f172a;border:1px solid #334155;color:#e2e8f0" />
+                    </div>
+                </div>
+
+                @* Current spend *@
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Current Spend</span>
+                    <span class="font-mono text-xs" style="color:@(isBreached ? "#ef4444" : isApproaching ? "#f59e0b" : "#e2e8f0")">
+                        $@Money2(provider.CurrentSpend)
+                    </span>
+                </div>
+
+                @* Utilization bar *@
+                <div>
+                    <div class="flex justify-between text-xs font-mono text-slate-500 mb-1">
+                        <span>@pct.ToString("F1", CultureInfo.InvariantCulture)% utilized</span>
+                        <span>$@Money2(provider.CurrentSpend) / $@Money2(provider.BudgetCap)</span>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div class="h-full rounded"
+                             style="width:@pct.ToString("F1", CultureInfo.InvariantCulture)%;background:@barColor;transition:width 0.6s ease, background-color 0.3s"></div>
+                    </div>
+                </div>
+
+                @* Status tag *@
+                <div class="rounded px-2 py-1.5 text-xs"
+                     style="background:@(isBreached ? "#ef444411" : isApproaching ? "#f59e0b11" : "#10b98111");
+                            border-top:1px solid @(isBreached ? "#ef444422" : isApproaching ? "#f59e0b22" : "#10b98122")">
+                    @if (isBreached)
+                    {
+                        <span style="color:#ef4444">🚨 CRITICAL: Budget Exhausted. Fallback Engine Engaged.</span>
+                    }
+                    else if (isApproaching)
+                    {
+                        <span style="color:#f59e0b">⚠️ Approaching cap (Est. @provider.EstimatedDaysRemaining days remaining)</span>
+                    }
+                    else
+                    {
+                        <span class="text-slate-500">✅ Spend nominal</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<Provider> Providers { get; set; } = [];
+
+    /// <summary>When set, the matching provider card plays its flash animation (see app.css keyframes).</summary>
+    [Parameter]
+    public string? FlashId { get; set; }
+
+    private readonly Dictionary<string, string> _caps = [];
+
+    private IEnumerable<Provider> Sorted =>
+        Providers.OrderByDescending(p => p.CurrentSpend / p.BudgetCap);
+
+    protected override void OnParametersSet()
+    {
+        foreach (var provider in Providers)
+        {
+            _caps.TryAdd(provider.Id, Money2(provider.BudgetCap));
+        }
+    }
+
+    private static string Money2(decimal value) => value.ToString("F2", CultureInfo.InvariantCulture);
+}

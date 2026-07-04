@@ -1,0 +1,195 @@
+@* Model Distribution tab: time filter bar, token volume histogram, and model market share donut. *@
+<div class="h-full flex flex-col gap-3 min-h-0">
+    @* Time filter bar (visual only for now - the mock data has a single fixed range) *@
+    <div class="flex items-center gap-2 shrink-0">
+        <div class="flex rounded overflow-hidden border border-slate-700">
+            @foreach (var filter in TimeFilters)
+            {
+                var isActive = _activeFilter == filter;
+                <button @onclick="() => _activeFilter = filter"
+                        class="px-3 py-1.5 text-xs font-medium transition-colors"
+                        style="background:@(isActive ? "#38bdf8" : "#1e293b");
+                               color:@(isActive ? "#0f172a" : "#64748b");
+                               border-right:@(filter != "Year" ? "1px solid #334155" : "none")">
+                    @filter
+                </button>
+            }
+        </div>
+        <div class="ml-auto flex items-center gap-2">
+            <input type="text" placeholder="From" class="rounded px-2 py-1.5 text-xs font-mono w-24"
+                   style="background:#1e293b;border:1px solid #334155;color:#64748b" />
+            <span class="text-slate-600 text-xs">—</span>
+            <input type="text" placeholder="To" class="rounded px-2 py-1.5 text-xs font-mono w-24"
+                   style="background:#1e293b;border:1px solid #334155;color:#64748b" />
+        </div>
+    </div>
+
+    @* Charts row *@
+    <div class="flex gap-3 flex-1 min-h-0">
+        @* Token histogram *@
+        <div class="flex-1 rounded-lg p-4 flex flex-col min-h-0" style="background:#1e293b;border:1px solid #334155">
+            <div class="mb-3 shrink-0">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Token Volume Histogram</div>
+                <div class="flex items-center gap-4 mt-1.5">
+                    <span class="flex items-center gap-1.5 text-xs font-mono text-slate-500">
+                        <span class="w-2 h-2 rounded-sm" style="background:#38bdf8"></span> Prompt
+                    </span>
+                    <span class="flex items-center gap-1.5 text-xs font-mono text-slate-500">
+                        <span class="w-2 h-2 rounded-sm" style="background:#10b981"></span> Completion
+                    </span>
+                </div>
+            </div>
+            <div class="flex-1 min-h-0">
+                <ApexChart TItem="TokenBucket" Options="_histogramOptions" Height="@("100%")">
+                    <ApexPointSeries TItem="TokenBucket"
+                                     Items="TokenBuckets"
+                                     Name="Prompt"
+                                     SeriesType="SeriesType.Bar"
+                                     Color="#38bdf8"
+                                     XValue="e => e.Slot"
+                                     YValue="e => e.Prompt" />
+                    <ApexPointSeries TItem="TokenBucket"
+                                     Items="TokenBuckets"
+                                     Name="Completion"
+                                     SeriesType="SeriesType.Bar"
+                                     Color="#10b981"
+                                     XValue="e => e.Slot"
+                                     YValue="e => e.Completion" />
+                </ApexChart>
+            </div>
+        </div>
+
+        @* Model market share *@
+        <div class="rounded-lg p-4 flex flex-col min-h-0" style="background:#1e293b;border:1px solid #334155;width:42%">
+            <div class="mb-2 shrink-0">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Model Market Share</div>
+                <div class="text-xs text-slate-600 mt-0.5">By execution volume</div>
+            </div>
+            <div class="flex-1 min-h-0">
+                <ApexChart TItem="ModelShare" Options="_donutOptions" Height="@("100%")">
+                    <ApexPointSeries TItem="ModelShare"
+                                     Items="ModelShares"
+                                     Name="Share"
+                                     SeriesType="SeriesType.Donut"
+                                     XValue="e => e.Model"
+                                     YValue="e => e.Value" />
+                </ApexChart>
+            </div>
+            @* Custom legend matching the original design (the built-in apex legend is hidden). *@
+            <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 justify-center shrink-0">
+                @foreach (var share in ModelShares)
+                {
+                    <div class="flex items-center gap-1.5 text-xs font-mono text-slate-400">
+                        <span class="w-2 h-2 rounded-full shrink-0" style="background:@share.Color"></span>
+                        @share.Model
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private static readonly string[] TimeFilters = ["Day", "Month", "3-Month", "6-Month", "Year"];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TokenBucket> TokenBuckets { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<ModelShare> ModelShares { get; set; } = [];
+
+    private string _activeFilter = "Month";
+
+    private ApexChartOptions<TokenBucket> _histogramOptions = new();
+    private ApexChartOptions<ModelShare> _donutOptions = new();
+
+    // Formats raw token counts the same way the original chart did: 2.8M / 980K.
+    private const string TokenCountFormatter =
+        "function (value) { return value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'; }";
+
+    protected override void OnInitialized()
+    {
+        _histogramOptions = new ApexChartOptions<TokenBucket>
+        {
+            Chart = new Chart
+            {
+                Toolbar = new Toolbar { Show = false },
+                Background = "transparent",
+                ForeColor = "#475569",
+                FontFamily = "JetBrains Mono, monospace",
+                Animations = new Animations { Enabled = false },
+            },
+            PlotOptions = new PlotOptions
+            {
+                Bar = new PlotOptionsBar { ColumnWidth = "40%", BorderRadius = 2 },
+            },
+            Legend = new Legend { Show = false },
+            DataLabels = new DataLabels { Enabled = false },
+            Grid = new Grid
+            {
+                BorderColor = "#1e3a5f",
+                StrokeDashArray = 3,
+                Xaxis = new GridXAxis { Lines = new Lines { Show = false } },
+            },
+            Tooltip = new Tooltip
+            {
+                Theme = Mode.Dark,
+                Y = new TooltipY { Formatter = TokenCountFormatter },
+            },
+            Xaxis = new XAxis
+            {
+                AxisBorder = new AxisBorder { Show = false },
+                AxisTicks = new AxisTicks { Show = false },
+                Labels = new XAxisLabels { Style = new AxisLabelStyle { FontSize = "10px" } },
+            },
+            Yaxis =
+            [
+                new YAxis
+                {
+                    Min = 0,
+                    Max = 6_000_000,
+                    TickAmount = 4,
+                    Labels = new YAxisLabels
+                    {
+                        Style = new AxisLabelStyle { FontSize = "10px" },
+                        Formatter = TokenCountFormatter,
+                    },
+                },
+            ],
+        };
+
+        _donutOptions = new ApexChartOptions<ModelShare>
+        {
+            Chart = new Chart
+            {
+                Toolbar = new Toolbar { Show = false },
+                Background = "transparent",
+                FontFamily = "JetBrains Mono, monospace",
+                Animations = new Animations { Enabled = false },
+            },
+            // Slice colors in item order, matching each entry's configured color.
+            Colors = ModelShares.Select(s => s.Color).ToList(),
+            PlotOptions = new PlotOptions
+            {
+                Pie = new PlotOptionsPie
+                {
+                    Donut = new PlotOptionsDonut
+                    {
+                        // Original ring: inner radius 42% / outer 68% of the chart => hole is ~62% of the ring.
+                        Size = "62%",
+                        Labels = new DonutLabels { Show = false },
+                    },
+                },
+            },
+            // The ring segments are separated by the card background rather than white slice borders.
+            Stroke = new Stroke { Colors = ["#1e293b"], Width = 2 },
+            Legend = new Legend { Show = false },
+            DataLabels = new DataLabels { Enabled = false },
+            Tooltip = new Tooltip
+            {
+                Theme = Mode.Dark,
+                Y = new TooltipY { Formatter = "function (value) { return value + '%'; }" },
+            },
+        };
+    }
+}

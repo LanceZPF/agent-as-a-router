@@ -1,0 +1,179 @@
+@* Root dashboard component: header with live status banner, ticker row, tab bar, and the active tab. *@
+<div class="flex flex-col h-screen overflow-hidden" style="background:#0f172a">
+    @* ── HEADER ── *@
+    <header style="background:#1e293b;border-bottom:1px solid #334155">
+        <div class="flex items-center justify-between px-4 py-2.5">
+            @* Brand *@
+            <div class="flex items-center gap-2">
+                <span class="text-sm font-bold tracking-tight text-slate-100">
+                    🤖 Router Optimization Engine
+                </span>
+            </div>
+
+            @* Status banner *@
+            <div class="flex items-center">
+                @if (_breached.Count > 0 && _approaching.Count > 0)
+                {
+                    <button @onclick="HandleAlertClick" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <span class="font-semibold text-xs" style="color:#ef4444">🚨 @_breached.Count BREACHED</span>
+                        <span class="text-slate-600">|</span>
+                        <span class="font-semibold text-xs" style="color:#f59e0b">⚠️ @_approaching.Count APPROACHING LIMIT</span>
+                    </button>
+                }
+                else if (_breached.Count > 0)
+                {
+                    <button @onclick="HandleAlertClick" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <span class="font-semibold text-xs" style="color:#ef4444">🚨 @_breached.Count PROVIDER BREACHED</span>
+                    </button>
+                }
+                else if (_approaching.Count > 0)
+                {
+                    <button @onclick="HandleAlertClick" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <span class="font-semibold text-xs" style="color:#f59e0b">⚠️ @_approaching.Count PROVIDER APPROACHING LIMIT</span>
+                    </button>
+                }
+                else
+                {
+                    <div class="flex items-center gap-2">
+                        <span class="pulse-dot w-1.5 h-1.5 rounded-full" style="background:#10b981"></span>
+                        <span class="text-xs font-medium" style="color:#10b981">System Status: OK</span>
+                    </div>
+                }
+            </div>
+
+            @* Actions *@
+            <div class="flex items-center gap-2">
+                <button @onclick="() => _showSettings = true"
+                        class="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs font-medium border border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200 transition-colors">
+                    <Icon Name="settings" Size="12" />
+                    Settings
+                </button>
+            </div>
+        </div>
+
+        @* Ticker row *@
+        <div class="flex items-center gap-6 px-4 py-1.5" style="border-top:1px solid #0f172a;background:#172033">
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-500">Total Saved</span>
+                <span class="font-mono text-xs font-semibold" style="color:#10b981">$142.36</span>
+            </div>
+            <div class="w-px h-3" style="background:#334155"></div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-500">System Tokens</span>
+                <span class="font-mono text-xs font-semibold text-slate-200">12.4M</span>
+            </div>
+            <div class="w-px h-3" style="background:#334155"></div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-500">Avg. Cost Reduction</span>
+                <span class="font-mono text-xs font-semibold" style="color:#10b981">74.20% ↓</span>
+            </div>
+            <div class="ml-auto flex items-center gap-1.5">
+                <span class="pulse-dot w-1.5 h-1.5 rounded-full" style="background:#10b981"></span>
+                <span class="text-xs font-mono text-slate-600">LIVE</span>
+            </div>
+        </div>
+    </header>
+
+    @* ── TAB BAR ── *@
+    <nav class="flex items-end px-4 gap-0 shrink-0" style="background:#1e293b;border-bottom:1px solid #334155">
+        @foreach (var (tab, icon, label) in Tabs)
+        {
+            var isActive = _activeTab == tab;
+            <button @onclick="() => _activeTab = tab"
+                    class="relative flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium transition-colors"
+                    style="color:@(isActive ? "#38bdf8" : "#64748b");
+                           background:@(isActive ? "#0f172a" : "transparent");
+                           border-top:1px solid @(isActive ? "#334155" : "transparent");
+                           border-left:1px solid @(isActive ? "#334155" : "transparent");
+                           border-right:1px solid @(isActive ? "#334155" : "transparent");
+                           border-bottom:1px solid @(isActive ? "#0f172a" : "transparent");
+                           border-radius:6px 6px 0 0;
+                           margin-bottom:-1px">
+                <Icon Name="@icon" Size="13" />
+                @label
+            </button>
+        }
+    </nav>
+
+    @* ── WORKSPACE ── *@
+    <main class="flex-1 overflow-hidden p-3 min-h-0">
+        @switch (_activeTab)
+        {
+            case Tab.Live:
+                <LiveStream Entries="MockData.Entries" SelectedId="@_selectedEntryId" OnSelect="id => _selectedEntryId = id" />
+                break;
+            case Tab.Analytics:
+                <CostAnalytics CostData="MockData.CostData" AgentRoi="MockData.AgentRoi" />
+                break;
+            case Tab.Distribution:
+                <ModelDistribution TokenBuckets="MockData.TokenBuckets" ModelShares="MockData.ModelShares" />
+                break;
+            case Tab.Governance:
+                <Governance Providers="MockData.Providers" FlashId="@_flashId" />
+                break;
+        }
+    </main>
+
+    @* ── SETTINGS MODAL ── *@
+    @if (_showSettings)
+    {
+        <SettingsModal OnClose="() => _showSettings = false" />
+    }
+</div>
+
+@code {
+    private enum Tab
+    {
+        Live,
+        Analytics,
+        Distribution,
+        Governance,
+    }
+
+    private static readonly (Tab Tab, string Icon, string Label)[] Tabs =
+    [
+        (Tab.Live, "activity", "Live Stream"),
+        (Tab.Analytics, "bar-chart", "Cost Analytics"),
+        (Tab.Distribution, "trending-up", "Model Distribution"),
+        (Tab.Governance, "shield-check", "Governance"),
+    ];
+
+    private Tab _activeTab = Tab.Live;
+    private string _selectedEntryId = MockData.Entries[0].Id;
+    private bool _showSettings;
+    private string? _flashId;
+
+    private List<Provider> _breached = [];
+    private List<Provider> _approaching = [];
+
+    protected override void OnInitialized()
+    {
+        _breached = MockData.Providers.Where(p => p.CurrentSpend / p.BudgetCap >= 1).ToList();
+        _approaching = MockData.Providers
+            .Where(p =>
+            {
+                var pct = p.CurrentSpend / p.BudgetCap;
+                return pct >= 0.8m && pct < 1;
+            })
+            .ToList();
+    }
+
+    // Clicking the alert banner jumps to Governance and briefly flashes the offending provider card.
+    private async Task HandleAlertClick()
+    {
+        _activeTab = Tab.Governance;
+        var targetId = _breached.FirstOrDefault()?.Id ?? _approaching.FirstOrDefault()?.Id;
+        if (targetId is null)
+        {
+            return;
+        }
+
+        _flashId = null;
+        StateHasChanged();
+        await Task.Delay(50);
+        _flashId = targetId;
+        StateHasChanged();
+        await Task.Delay(4000);
+        _flashId = null;
+    }
+}

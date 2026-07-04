@@ -1,0 +1,214 @@
+@* Live Stream tab: searchable routing-entry list on the left, drilldown for the selection on the right. *@
+@if (SelectedOrDefault is null)
+{
+    <div class="h-full flex items-center justify-center text-xs text-slate-500">No routing entries yet.</div>
+    @{ return; }
+}
+
+<div class="flex h-full gap-2 min-h-0">
+    @* Left column: stream *@
+    <div class="flex flex-col min-h-0" style="width:40%">
+        @* Search *@
+        <div class="relative shrink-0 mb-2">
+            <Icon Name="search" Size="13" Class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <input type="text"
+                   placeholder="Search by session or agent..."
+                   value="@_search"
+                   @oninput="e => _search = (string?)e.Value ?? string.Empty"
+                   class="w-full rounded pl-8 pr-3 py-2 text-xs font-mono"
+                   style="background:#1e293b;border:1px solid #334155;color:#94a3b8" />
+        </div>
+
+        @* Cards *@
+        <div class="flex-1 overflow-y-auto space-y-1.5 pr-1">
+            @foreach (var entry in Filtered)
+            {
+                var isSelected = SelectedId == entry.Id;
+                <button @key="entry.Id"
+                        @onclick="() => OnSelect.InvokeAsync(entry.Id)"
+                        class="w-full text-left rounded card-hover"
+                        style="background:@(isSelected ? "#263548" : "#1e293b");
+                               border:1px solid @(isSelected ? "#38bdf8" : entry.IsFallback ? "#f59e0b33" : "#334155");
+                               padding:8px 10px">
+                    <div class="flex items-center gap-2 mb-1">
+                        @if (entry.IsFallback)
+                        {
+                            <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold"
+                                  style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">⚠</span>
+                        }
+                        <span class="text-xs font-mono text-slate-400">
+                            Session: <span class="text-slate-200">@(entry.SessionId)...</span>
+                        </span>
+                        <span class="ml-auto text-xs text-slate-600 font-mono">@entry.Timestamp</span>
+                    </div>
+                    <div class="text-xs font-mono mb-1">
+                        <span class="text-slate-500">Model: </span>
+                        <span style="color:@(entry.IsFallback ? "#f59e0b" : "#38bdf8")">@entry.Model</span>
+                    </div>
+                    <div class="text-xs font-mono">
+                        @if (entry.IsFallback)
+                        {
+                            <span style="color:#64748b">Saved: $0.000000 (0.00% <span>➔</span>)</span>
+                        }
+                        else
+                        {
+                            <span style="color:#10b981">
+                                Saved: $@Money6(entry.SavingsAmount)
+                                <span class="text-emerald-400">(@Pct2(entry.SavingsPercent)% ↓)</span>
+                            </span>
+                        }
+                    </div>
+                    <div class="text-xs text-slate-600 mt-0.5">@entry.Agent</div>
+                </button>
+            }
+        </div>
+    </div>
+
+    @* Right column: drilldown *@
+    <div class="flex flex-col min-h-0 overflow-y-auto flex-1 space-y-2 pr-1">
+        @* Header *@
+        <div class="rounded p-3 shrink-0" style="background:#1e293b;border:1px solid #334155">
+            <div class="flex items-baseline gap-3 mb-0.5">
+                <span class="text-xs text-slate-400">Trace</span>
+                <span class="font-mono text-xs text-sky-400">#@(Selected.TraceId)...</span>
+            </div>
+            <div class="text-xs text-slate-400">
+                Assigned Agent: <span class="text-slate-200 font-medium">@Selected.Agent</span>
+            </div>
+        </div>
+
+        @* Token Volume *@
+        <div class="rounded p-3 shrink-0" style="background:#1e293b;border:1px solid #334155">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Token Volume</div>
+            <div class="grid grid-cols-3 gap-2 mb-3">
+                @foreach (var (label, val) in TokenCells)
+                {
+                    <div class="rounded p-2 text-center" style="background:#0f172a">
+                        <div class="font-mono text-sm text-slate-200">@val.ToString("N0", CultureInfo.InvariantCulture)</div>
+                        <div class="text-xs text-slate-500 mt-0.5">@label</div>
+                    </div>
+                }
+            </div>
+            @* Prompt/completion proportion bar *@
+            <div class="space-y-1">
+                <div class="flex h-2 rounded overflow-hidden">
+                    <div style="width:@Pct2(PromptPct)%;background:#38bdf8"></div>
+                    <div style="width:@Pct2(CompletionPct)%;background:#10b981"></div>
+                </div>
+                <div class="flex justify-between text-xs font-mono text-slate-500">
+                    <span><span style="color:#38bdf8">■</span> @Pct2(PromptPct)% Prompt</span>
+                    <span><span style="color:#10b981">■</span> @Pct2(CompletionPct)% Completion</span>
+                </div>
+            </div>
+        </div>
+
+        @* Cost Performance *@
+        <div class="rounded p-3 shrink-0" style="background:#1e293b;border:1px solid #334155">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Cost Performance</div>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Actual Allocated Cost</span>
+                    <span class="font-mono text-xs" style="color:#e2e8f0">$@Money6(Selected.ActualCost)</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Worst-Case Pool Cost</span>
+                    <span class="font-mono text-xs" style="color:#94a3b8">$@Money6(Selected.WorstCaseCost)</span>
+                </div>
+                <div class="flex items-center justify-between pt-1 border-t border-slate-700/50">
+                    <span class="text-xs text-slate-400 font-medium">Net Transaction Savings</span>
+                    @if (Selected.IsFallback)
+                    {
+                        <span class="font-mono text-xs text-slate-500">$0.000000 (0.00% ➔)</span>
+                    }
+                    else
+                    {
+                        <span class="font-mono text-xs" style="color:#10b981">
+                            $@Money6(Selected.SavingsAmount) (@Pct2(Selected.SavingsPercent)% ↓)
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Routing Decision Inspector *@
+        <div class="rounded shrink-0" style="background:#1e293b;border:1px solid #334155">
+            <button @onclick="() => _collapsed = !_collapsed" class="w-full flex items-center justify-between px-3 py-2.5 text-left">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Routing Decision Inspector</span>
+                <span class="text-slate-500 text-xs">@(_collapsed ? "▶" : "▼")</span>
+            </button>
+            @if (!_collapsed)
+            {
+                <div class="px-3 pb-3 space-y-1.5">
+                    @foreach (var step in Selected.RoutingSteps)
+                    {
+                        @switch (step.Status)
+                        {
+                            case StepStatus.Warn:
+                                <div class="flex items-start gap-2 rounded px-2 py-1.5 text-xs font-mono"
+                                     style="background:rgba(245,158,11,0.12);border-left:2px solid #f59e0b">
+                                    <Icon Name="alert-triangle" Size="11" Class="mt-0.5 shrink-0" Style="color:#f59e0b" />
+                                    <span style="color:#fcd34d">@step.Message</span>
+                                </div>
+                                break;
+                            case StepStatus.Info:
+                                <div class="flex items-start gap-2 rounded px-2 py-1.5 text-xs font-mono"
+                                     style="background:rgba(56,189,248,0.1);border-left:2px solid #38bdf8">
+                                    <span class="mt-0.5 text-sky-400">👉</span>
+                                    <span style="color:#7dd3fc">@step.Message</span>
+                                </div>
+                                break;
+                            default:
+                                <div class="flex items-start gap-2 rounded px-2 py-1.5 text-xs font-mono"
+                                     style="background:rgba(16,185,129,0.08);border-left:2px solid #10b981">
+                                    <Icon Name="check-circle" Size="11" Class="mt-0.5 shrink-0" Style="color:#10b981" />
+                                    <span style="color:#6ee7b7">@step.Message</span>
+                                </div>
+                                break;
+                        }
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<RoutingEntry> Entries { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public string SelectedId { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> OnSelect { get; set; }
+
+    private string _search = string.Empty;
+    private bool _collapsed;
+
+    private IEnumerable<RoutingEntry> Filtered =>
+        Entries.Where(e => string.IsNullOrEmpty(_search)
+            || e.SessionId.Contains(_search, StringComparison.Ordinal)
+            || e.Agent.Contains(_search, StringComparison.OrdinalIgnoreCase));
+
+    private RoutingEntry? SelectedOrDefault => Entries.FirstOrDefault(e => e.Id == SelectedId) ?? Entries.FirstOrDefault();
+
+    // Guarded by the @if (SelectedOrDefault is null) { ... return; } check at the top of the markup.
+    private RoutingEntry Selected => SelectedOrDefault!;
+
+    private int TotalTokens => Selected.PromptTokens + Selected.CompletionTokens;
+
+    private decimal PromptPct => TotalTokens == 0 ? 0 : Selected.PromptTokens / (decimal)TotalTokens * 100;
+
+    private decimal CompletionPct => TotalTokens == 0 ? 0 : 100 - PromptPct;
+
+    private (string Label, int Value)[] TokenCells =>
+    [
+        ("Prompt", Selected.PromptTokens),
+        ("Completion", Selected.CompletionTokens),
+        ("Total", TotalTokens),
+    ];
+
+    private static string Money6(decimal value) => value.ToString("F6", CultureInfo.InvariantCulture);
+
+    private static string Pct2(decimal value) => value.ToString("F2", CultureInfo.InvariantCulture);
+}

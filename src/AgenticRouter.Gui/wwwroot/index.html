@@ -1,45 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>AgenticRouter Dashboard</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>AgenticRouter Dashboard</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.css" />
 </head>
 <body>
-  <header>
-    <h1>AgenticRouter Dashboard</h1>
-    <span class="badge badge-mock">Mock data</span>
-  </header>
+    <div id="root">Loading…</div>
 
-  <main>
-    <section class="card">
-      <h2>Proxy status</h2>
-      <dl>
-        <dt>State</dt>
-        <dd id="proxy-state">Unknown - not yet connected to the AgenticRouter service</dd>
-        <dt>Endpoint</dt>
-        <dd id="proxy-endpoint">http://localhost:5001</dd>
-      </dl>
-    </section>
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
 
-    <section class="card">
-      <h2>Recent routes</h2>
-      <table>
-        <thead>
-          <tr><th>Model</th><th>Provider</th><th>Status</th></tr>
-        </thead>
-        <tbody id="recent-routes">
-          <!-- Populated with placeholder rows by app.js. -->
-        </tbody>
-      </table>
-    </section>
-
-    <p class="notice">
-      This dashboard currently displays temporary, hard-coded placeholder data only. It is not yet wired up
-      to the AgenticRouter proxy service.
-    </p>
-  </main>
-
-  <script src="app.js"></script>
+    <script src="_framework/blazor.webview.js" autostart="false"></script>
 </body>
 </html>

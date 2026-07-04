@@ -1,0 +1,125 @@
+@* System settings modal: destructive actions gated behind a typed confirmation word. *@
+<div class="fixed inset-0 z-50 flex items-center justify-center"
+     style="background-color:rgba(0,0,0,0.7);backdrop-filter:blur(4px)"
+     @onclick="OnClose">
+    <div class="w-full max-w-md rounded-lg border border-slate-700" style="background:#1e293b"
+         @onclick:stopPropagation="true">
+        @* Header *@
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+            <span class="text-sm font-semibold text-slate-200 tracking-wide uppercase">System Settings</span>
+            <button @onclick="OnClose" class="text-slate-400 hover:text-slate-200 transition-colors">
+                <Icon Name="x" Size="16" />
+            </button>
+        </div>
+
+        <div class="p-5 space-y-4">
+            @* Destructive zone label *@
+            <div class="flex items-center gap-2 text-xs text-amber-400 font-medium uppercase tracking-widest">
+                <Icon Name="alert-triangle" Size="12" />
+                <span>Destructive Actions Zone</span>
+            </div>
+
+            @if (_activeAction is null)
+            {
+                <div class="grid grid-cols-2 gap-3">
+                    <button @onclick="@(() => StartAction("reset"))"
+                            class="flex items-center justify-center gap-2 rounded px-4 py-3 text-sm font-medium border border-amber-500/40 text-amber-400 hover:bg-amber-500/10 transition-colors">
+                        <Icon Name="rotate-ccw" Size="14" />
+                        Reset Stats
+                    </button>
+                    <button @onclick="@(() => StartAction("purge"))"
+                            class="flex items-center justify-center gap-2 rounded px-4 py-3 text-sm font-medium border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-colors">
+                        <Icon Name="trash" Size="14" />
+                        Clear History
+                    </button>
+                </div>
+            }
+            else
+            {
+                @* Confirmation step: the action only enables once the confirmation word is typed exactly. *@
+                <div class="space-y-3 rounded border p-4"
+                     style="border-color:@(_activeAction == "reset" ? "#f59e0b44" : "#ef444444");background:#0f172a">
+                    <p class="text-xs text-slate-400 leading-5">
+                        This action is <span class="text-red-400 font-semibold">irreversible</span>. Type
+                        <span class="font-mono text-slate-200 bg-slate-700 px-1.5 py-0.5 rounded text-xs">@Required</span>
+                        to confirm.
+                    </p>
+                    <input @ref="_confirmInput"
+                           type="text"
+                           value="@_confirmText"
+                           @oninput="e => _confirmText = ((string?)e.Value ?? string.Empty).ToUpperInvariant()"
+                           placeholder="Type @(Required)..."
+                           class="w-full rounded px-3 py-2 text-sm font-mono"
+                           style="background:#1e293b;border:1px solid #334155;color:#e2e8f0" />
+                    <div class="flex gap-2">
+                        <button @onclick="CancelAction"
+                                class="flex-1 rounded px-3 py-2 text-xs text-slate-400 border border-slate-600 hover:bg-slate-700 transition-colors">
+                            Cancel
+                        </button>
+                        <button @onclick="ExecuteAction"
+                                disabled="@(!IsConfirmed)"
+                                class="flex-1 rounded px-3 py-2 text-xs font-semibold transition-colors"
+                                style="background:@(IsConfirmed ? _activeAction == "reset" ? "#f59e0b" : "#ef4444" : "#1e293b");
+                                       color:@(IsConfirmed ? "#0f172a" : "#475569");
+                                       border:1px solid @(IsConfirmed ? "transparent" : "#334155");
+                                       cursor:@(IsConfirmed ? "pointer" : "not-allowed")">
+                            Confirm @(_activeAction == "reset" ? "Reset" : "Purge")
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <p class="text-xs text-slate-600 pt-1">
+                All system configurations, routing rules, and budget caps are preserved.
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private string? _activeAction;
+    private string _confirmText = string.Empty;
+    private ElementReference _confirmInput;
+    private bool _focusPending;
+
+    private string Required => _activeAction == "reset" ? "RESET" : "PURGE";
+
+    private bool IsConfirmed => _confirmText == Required;
+
+    private void StartAction(string action)
+    {
+        _activeAction = action;
+        _confirmText = string.Empty;
+        _focusPending = true;
+    }
+
+    private void CancelAction()
+    {
+        _activeAction = null;
+        _confirmText = string.Empty;
+    }
+
+    // No real reset/purge is wired up yet - confirming just closes the modal, matching the mock design.
+    private async Task ExecuteAction()
+    {
+        if (!IsConfirmed)
+        {
+            return;
+        }
+
+        CancelAction();
+        await OnClose.InvokeAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusPending)
+        {
+            _focusPending = false;
+            await _confirmInput.FocusAsync();
+        }
+    }
+}
