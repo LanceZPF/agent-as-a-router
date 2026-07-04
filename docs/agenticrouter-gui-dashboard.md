@@ -1,7 +1,7 @@
 # AgenticRouter.Gui Dashboard
 
-This document describes the dashboard SPA rendered inside `AgenticRouter.Gui`'s Photino window
-(`src/AgenticRouter.Gui/dashboard/`). For the tray-app shell itself (tray icon, show/hide behavior,
+This document describes the dashboard UI rendered inside `AgenticRouter.Gui`'s window
+(`src/AgenticRouter.Gui/Components/`). For the tray-app shell itself (tray icon, show/hide behavior,
 build/run instructions), see [`src/AgenticRouter.Gui/README.md`](../src/AgenticRouter.Gui/README.md).
 
 ## Purpose
@@ -10,7 +10,7 @@ The dashboard presents routing, cost, and governance telemetry for the AgenticRo
 requests were routed to which upstream model, how much that saved versus a worst-case baseline, token
 volume trends, model market share, and per-provider budget status.
 
-**Current status: all data is hard-coded mock data** (`dashboard/src/data/mockData.ts`). Nothing in the
+**Current status: all data is hard-coded mock data** (`Models/DashboardData.cs`). Nothing in the
 dashboard reads from the live `AgenticRouter` proxy yet - it is a UI/UX shell to be wired up to real
 telemetry in a later change.
 
@@ -18,16 +18,21 @@ telemetry in a later change.
 
 | Layer | Choice |
 | --- | --- |
-| UI framework | React 18 + TypeScript |
-| Build tool | Vite 5 |
-| Styling | Tailwind CSS (utility classes) + a handful of inline styles for state-driven colors |
-| Charts | [Recharts](https://recharts.org/) 3 (line, bar, and pie/donut charts) |
-| Icons | [lucide-react](https://lucide.dev/) |
+| App shell | .NET MAUI (Windows-only, single window, tray-resident via Win32 interop) |
+| UI framework | Razor components in a MAUI `BlazorWebView` (Blazor Hybrid) |
+| Styling | A static stylesheet (`wwwroot/css/app.css`) containing the dashboard's compiled Tailwind utility classes plus custom rules; state-driven colors are inline styles in the components |
+| Charts | [Blazor-ApexCharts](https://github.com/apexcharts/Blazor-ApexCharts) (`Blazor-ApexCharts-MAUI` package) - line, horizontal/grouped bar, and donut charts |
+| Icons | Small inline SVG glyphs (`Components/Icon.razor`) |
 
-The dashboard is a fully static single-page app: `npm run build` (from `dashboard/`) emits
-`index.html` plus a JS/CSS bundle directly into `src/AgenticRouter.Gui/wwwroot/`, which Photino loads
-from the local filesystem. There is no dev server, backend API, or router in production - all
-navigation is client-side React state (`activeTab` in `App.tsx`).
+The dashboard has no web build step: the Razor components compile with the .NET project, the stylesheet
+is checked-in static content, and the chart JavaScript ships inside the NuGet package's static web
+assets (so everything works offline). All navigation is client-side component state (`_activeTab` in
+`Components/Dashboard.razor`); there is no router, dev server, or backend API.
+
+The UI is a conversion of an earlier React/Vite/Tailwind implementation of the same design; the visual
+design, layout, colors, and mock data carry over unchanged. Because the stylesheet is the *compiled*
+Tailwind output of that design, new markup must stick to utility classes that already appear in it (or
+add plain CSS to `app.css`) - there is no Tailwind build to generate new utilities.
 
 ## Visual theme
 
@@ -64,7 +69,7 @@ scrolling internally where their content can overflow.
 ### Header
 
 - Brand: `🤖 Router Optimization Engine`.
-- Status banner (center): reads live from `MOCK_PROVIDERS`' budget utilization.
+- Status banner (center): reads live from `MockData.Providers`' budget utilization.
   - All providers under 80% of budget: green pulsing dot + "System Status: OK".
   - Any provider ≥ 100%: red "🚨 N PROVIDER BREACHED" (or "N BREACHED" alongside approaching count).
   - Any provider ≥ 80% and < 100%: amber "⚠️ N PROVIDER APPROACHING LIMIT".
@@ -76,55 +81,56 @@ scrolling internally where their content can overflow.
 
 ### Tabs
 
-1. **Live Stream** (`LiveStream.tsx`, default tab) - a two-column view:
-   - Left (40% width): a searchable, scrollable list of routing entries (`MOCK_ENTRIES`), newest first.
-     Each card shows session ID, timestamp, routed model, savings, and originating agent; fallback
+1. **Live Stream** (`LiveStream.razor`, default tab) - a two-column view:
+   - Left (40% width): a searchable, scrollable list of routing entries (`MockData.Entries`), newest
+     first. Each card shows session ID, timestamp, routed model, savings, and originating agent; fallback
      entries get an amber `⚠` badge and border. Search filters by session ID or agent name.
    - Right: a drilldown for the selected entry - trace ID/agent header, a token volume breakdown
      (prompt/completion/total counts plus a proportional bar), a cost performance panel (actual cost vs.
      worst-case cost vs. net savings), and a collapsible "Routing Decision Inspector" showing the
-     step-by-step routing log (`ok` = green check, `warn` = amber triangle, `info` = blue arrow).
+     step-by-step routing log (`Ok` = green check, `Warn` = amber triangle, `Info` = blue arrow).
 
-2. **Cost Analytics** (`CostAnalytics.tsx`) - two stacked panels:
-   - A cumulative savings line chart over time (`COST_DATA`), with a custom tooltip.
-   - A horizontal bar chart of cost-reduction % by agent (`AGENT_ROI`), bars colored by reduction tier
-     (≥85% green, ≥70% blue, else amber), with the percentage labeled at the end of each bar.
+2. **Cost Analytics** (`CostAnalytics.razor`) - two stacked panels:
+   - A cumulative savings line chart over time (`MockData.CostData`), with a dark tooltip.
+   - A horizontal bar chart of cost-reduction % by agent (`MockData.AgentRoi`), bars colored by reduction
+     tier (≥85% green, ≥70% blue, else amber), with the percentage labeled at the end of each bar.
 
-3. **Model Distribution** (`ModelDistribution.tsx`) - a time-range filter bar (Day/Month/3-Month/
+3. **Model Distribution** (`ModelDistribution.razor`) - a time-range filter bar (Day/Month/3-Month/
    6-Month/Year - visual only, does not currently refilter data) with From/To text inputs, above:
-   - A grouped bar chart of prompt vs. completion token volume by day (`TOKEN_BUCKETS`).
-   - A donut chart of model market share by execution volume (`MODEL_SHARE`), with a custom legend below
-     it.
+   - A grouped bar chart of prompt vs. completion token volume by day (`MockData.TokenBuckets`).
+   - A donut chart of model market share by execution volume (`MockData.ModelShares`), with a custom
+     HTML legend below it.
 
-4. **Governance** (`Governance.tsx`) - a 2-column grid of provider budget cards (`MOCK_PROVIDERS`),
-   sorted by utilization (highest first). Each card shows the provider name/pool label, an editable
-   (client-side only, not persisted) budget cap input, current spend, a utilization progress bar, and a
-   status tag: `OK` (<80%), `WARNING` (80-99%, shows estimated days remaining), or `CRITICAL` (≥100%,
-   "Fallback Engine Engaged"). Cards flash their border briefly when navigated to via the header's alert
-   banner.
+4. **Governance** (`Governance.razor`) - a 2-column grid of provider budget cards
+   (`MockData.Providers`), sorted by utilization (highest first). Each card shows the provider name/pool
+   label, an editable (client-side only, not persisted) budget cap input, current spend, a utilization
+   progress bar, and a status tag: `OK` (<80%), `WARNING` (80-99%, shows estimated days remaining), or
+   `CRITICAL` (≥100%, "Fallback Engine Engaged"). Cards flash their border briefly when navigated to via
+   the header's alert banner.
 
-### Settings modal (`SettingsModal.tsx`)
+### Settings modal (`SettingsModal.razor`)
 
 Opened via the header's **Settings** button. A centered modal (dimmed/blurred backdrop, click-outside to
 close) with a "Destructive Actions Zone": **Reset Stats** and **Clear History** buttons, each requiring
 the user to type a literal confirmation word (`RESET` / `PURGE`) before the action button enables. No
 action is actually wired to real data yet - confirming just closes the modal.
 
-## Data model (`dashboard/src/data/mockData.ts`)
+## Data model (`Models/DashboardData.cs`)
 
-All dashboard state is derived from six exported mock constants, typed via exported interfaces:
+All dashboard state is derived from six mock collections on the static `MockData` class, typed via C#
+records:
 
-- `MOCK_ENTRIES: RoutingEntry[]` - individual routing decisions (session/trace IDs, agent, model,
+- `MockData.Entries: RoutingEntry[]` - individual routing decisions (session/trace IDs, agent, model,
   fallback flag, token counts, actual vs. worst-case cost, savings, timestamp, and an ordered
-  `routingSteps` log).
-- `MOCK_PROVIDERS: Provider[]` - per-provider budget state (cap, current spend, estimated days
+  `RoutingSteps` log).
+- `MockData.Providers: Provider[]` - per-provider budget state (cap, current spend, estimated days
   remaining).
-- `COST_DATA: CostDataPoint[]` - cumulative savings time series.
-- `AGENT_ROI: AgentROI[]` - cost-reduction % and savings per agent.
-- `TOKEN_BUCKETS: TokenBucket[]` - daily prompt/completion token volume.
-- `MODEL_SHARE: ModelShare[]` - market-share percentage and color per model.
+- `MockData.CostData: CostDataPoint[]` - cumulative savings time series.
+- `MockData.AgentRoi: AgentRoi[]` - cost-reduction % and savings per agent.
+- `MockData.TokenBuckets: TokenBucket[]` - daily prompt/completion token volume.
+- `MockData.ModelShares: ModelShare[]` - market-share percentage and color per model.
 
-Wiring the dashboard to the live proxy means replacing these constants with data fetched from
+Wiring the dashboard to the live proxy means replacing these collections with data fetched from
 `AgenticRouter`'s actual routing/telemetry, without needing to change the component layer.
 
 ## Known gaps / non-functional controls
@@ -134,3 +140,8 @@ These match the source design as received and are called out so they aren't mist
 - Model Distribution's time-range filter buttons and From/To inputs don't actually refilter the charts.
 - Governance's budget cap input is editable but not persisted or wired to anything.
 - Settings modal's Reset/Clear actions don't affect any data - they just close the modal once confirmed.
+- Chart axis ranges (e.g. the $0-$160 savings scale, the 0-6M token scale) are pinned to fit the mock
+  data; they'll need to become dynamic when real telemetry is wired in.
+- The chart tooltips use ApexCharts' dark theme (restyled in `app.css` to match the card styling) rather
+  than the fully custom tooltips of the original React implementation - minor visual differences are
+  expected there.

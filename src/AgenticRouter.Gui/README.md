@@ -1,59 +1,57 @@
 # AgenticRouter.Gui
 
-A Windows system tray application providing UI/UX for the AgenticRouter proxy. This project is
-independent of the `AgenticRouter` proxy service - it does not start, stop, or otherwise manage it.
+A Windows system tray application providing UI/UX for the AgenticRouter proxy, built as a
+**.NET MAUI Blazor Hybrid** app. This project is independent of the `AgenticRouter` proxy service - it
+does not start, stop, or otherwise manage it.
 
 ## Behavior
 
 - On launch, only a tray icon appears (no window, no console).
 - Right-click the tray icon and select **Show Dashboard** to open the dashboard window (or double-click
-  the icon). The dashboard is a React single-page app rendered with [Photino](https://tryphotino.io/)
-  (`wwwroot/index.html`) - see `dashboard/` below and
-  [`docs/agenticrouter-gui-dashboard.md`](../../docs/agenticrouter-gui-dashboard.md) for details on the
-  dashboard itself.
+  the icon). The dashboard is a Razor single-page app hosted in a `BlazorWebView` - see
+  [`docs/agenticrouter-gui-dashboard.md`](../../docs/agenticrouter-gui-dashboard.md) for a full
+  description of the UI.
 - Clicking the dashboard window's minimize button, or its close (X) button, hides it back into the tray
   icon rather than minimizing to the taskbar or exiting the app.
 - Select **Exit** from the tray context menu to actually quit.
 
 ## Current limitations
 
-The dashboard currently displays hard-coded mock data (see `dashboard/src/data/mockData.ts`) - it is not
-yet connected to the running AgenticRouter proxy.
+The dashboard displays hard-coded mock data (see `Models/DashboardData.cs`) - it is not yet connected to
+the running AgenticRouter proxy. Replacing `MockData` with real telemetry is the intended integration
+seam.
 
-## The dashboard (`dashboard/`)
+## Project layout
 
-`wwwroot/` is *generated* - it is not checked into git (see the root `.gitignore`). The dashboard's
-source (React + TypeScript + Vite + Tailwind + Recharts) lives in `dashboard/` and is built directly into
-`wwwroot/` via Vite's `build.outDir`.
+| Path | Purpose |
+| --- | --- |
+| `App.cs`, `MainPage.cs`, `MauiProgram.cs` | MAUI shell: one window hosting a full-window `BlazorWebView`. |
+| `Components/` | The dashboard's Razor components (tabs, cards, settings modal, icons). |
+| `Models/DashboardData.cs` | Dashboard data model + the mock data. |
+| `Platforms/Windows/TrayWindowManager.cs` | Win32 tray icon + WndProc subclass implementing the tray-resident window behavior (MAUI has no built-in tray support). |
+| `wwwroot/` | Blazor host page and the dashboard stylesheet (`css/app.css`). Static source - no build step. |
 
-`AgenticRouter.Gui.csproj` runs `npm install`/`npm run build` in `dashboard/` automatically as part of
-`dotnet build`/`dotnet run` (see the `BuildDashboardSpa` target), so a plain `dotnet run` works from a
-fresh checkout. This requires **Node.js/npm on `PATH`**. It's skipped once `wwwroot/index.html` is newer
-than every file under `dashboard/`, so incremental builds don't re-run npm unnecessarily. To build the
-dashboard manually instead (e.g. to see npm's output directly, or without invoking `dotnet build`):
+Charts are rendered with [Blazor-ApexCharts](https://github.com/apexcharts/Blazor-ApexCharts) (the
+`Blazor-ApexCharts-MAUI` package), which bundles its JavaScript as static web assets, so the charts work
+offline inside the WebView.
 
-```bash
-cd src/AgenticRouter.Gui/dashboard
-npm install
-npm run build
-```
+## Prerequisites
 
-Other useful commands from `dashboard/`:
-
-```bash
-npm run dev        # Vite dev server with hot reload, for iterating on the dashboard in a browser
-npm run typecheck  # tsc --noEmit
-npm run lint       # eslint
-```
-
-`vite.config.ts` sets `base: './'` so the built asset references are relative - required for Photino to
-load them from the local filesystem (`Load("wwwroot/index.html")`) rather than as absolute web-root paths.
+- Windows 10 1809+ (the app targets `net10.0-windows10.0.19041.0` and uses Win32 tray APIs).
+- The **.NET MAUI workload**: either check ".NET Multi-platform App UI development" in the Visual Studio
+  installer, or run `dotnet workload install maui-windows`.
+- The Microsoft Edge **WebView2 runtime** (preinstalled on Windows 11 and most updated Windows 10
+  machines).
 
 ## Running
-
-Requires Windows (the tray icon and window-hiding behavior use Win32 APIs via `NativeMethods.cs`).
 
 ```powershell
 cd src/AgenticRouter.Gui
 dotnet run
 ```
+
+Or open the solution in Visual Studio and press F5 (the "Windows Machine" profile runs the app
+unpackaged - no MSIX registration or signing needed).
+
+Note: the app starts minimized to the system tray by design. If nothing seems to happen after launch,
+look for the AgenticRouter icon in the tray, right-click it, and choose **Show Dashboard**.

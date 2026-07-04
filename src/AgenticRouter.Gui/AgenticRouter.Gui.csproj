@@ -1,59 +1,42 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <!-- WinExe hides the console window; the app only shows a tray icon and, on demand, the dashboard. -->
+    <!-- Windows-only .NET MAUI Blazor Hybrid app: a BlazorWebView hosts the Razor dashboard, and the
+         window lives in the system tray (see Platforms/Windows/TrayWindowManager.cs). -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>AgenticRouter.Gui</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <LangVersion>preview</LangVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <!-- NotifyIcon (system tray icon + context menu) comes from Windows Forms. -->
-    <UseWindowsForms>true</UseWindowsForms>
+
+    <ApplicationTitle>AgenticRouter</ApplicationTitle>
+    <ApplicationId>com.agenticrouter.gui</ApplicationId>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+
+    <!-- Unpackaged (no MSIX) so `dotnet run` / F5 work without package registration or signing. -->
+    <WindowsPackageType>None</WindowsPackageType>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- dashboard/ is a separate npm-managed subproject (source only - node_modules, .tsx, etc.); it is
-         built by `npm run build` into wwwroot/ (see dashboard/vite.config.ts) and must not be globbed
-         into this project's own item list. -->
-    <Compile Remove="dashboard\**" />
-    <None Remove="dashboard\**" />
-    <Content Remove="dashboard\**" />
-
-    <Compile Remove="wwwroot\**" />
-
-    <!-- Build input tracking for BuildDashboardSpa below; excludes node_modules (huge, and irrelevant to
-         whether the built output is stale). -->
-    <DashboardSourceFiles Include="dashboard\**\*.*" Exclude="dashboard\node_modules\**" />
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#0f172a" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Photino.NET" Version="4.0.16" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
+    <!-- Charts: Blazor wrapper for ApexCharts.js. The MAUI flavor registers the chart service via
+         AddApexChartsMaui() and bundles its JS as static web assets, so it works offline in the
+         BlazorWebView. -->
+    <PackageReference Include="Blazor-ApexCharts-MAUI" Version="6.1.0" />
   </ItemGroup>
-
-  <!-- Builds the dashboard SPA (React/Vite, under dashboard/) into wwwroot/ before compiling, so a fresh
-       checkout works with a plain `dotnet build`/`dotnet run` and no manual npm step. Requires Node.js/npm
-       on PATH. Skipped automatically once wwwroot/index.html is newer than every file under dashboard/. -->
-  <Target Name="BuildDashboardSpa"
-          BeforeTargets="BeforeBuild"
-          Inputs="@(DashboardSourceFiles)"
-          Outputs="wwwroot\index.html">
-    <Exec Command="npm install"
-          WorkingDirectory="dashboard"
-          Condition="!Exists('dashboard\node_modules')" />
-    <Exec Command="npm run build" WorkingDirectory="dashboard" />
-  </Target>
-
-  <!-- Re-globs wwwroot/ immediately after BuildDashboardSpa, whether it just ran or was skipped as
-       up-to-date. A glob evaluated once at project-load time (e.g. a plain <None Update="wwwroot\**">)
-       would miss freshly generated files or reference stale ones, since Vite's output filenames are
-       content-hashed and change on every real build. -->
-  <Target Name="IncludeDashboardOutput" AfterTargets="BuildDashboardSpa" BeforeTargets="BeforeBuild">
-    <ItemGroup>
-      <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot')" />
-    </ItemGroup>
-  </Target>
 
 </Project>
