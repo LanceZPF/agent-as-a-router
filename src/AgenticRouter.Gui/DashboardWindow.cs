@@ -60,7 +60,7 @@ internal sealed class DashboardWindow : IDisposable
             _window = new PhotinoWindow()
                 .SetTitle("AgenticRouter Dashboard")
                 .SetUseOsDefaultSize(false)
-                .SetSize(new Size(1024, 700))
+                .SetSize(new Size(1440, 900))
                 .Center()
                 .RegisterWindowCreatedHandler((_, _) => NativeMethods.Hide(_window!.WindowHandle))
                 .RegisterMinimizedHandler((_, _) => NativeMethods.Hide(_window!.WindowHandle))
