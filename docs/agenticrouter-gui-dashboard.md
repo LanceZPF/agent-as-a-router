@@ -53,17 +53,14 @@ scrolling internally where their content can overflow.
 
 ## Layout
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 🤖 Router Optimization Engine   [status banner]   [Settings]│  <- header
-│ Total Saved  System Tokens  Avg. Cost Reduction   ● LIVE     │  <- ticker row
-├─────────────────────────────────────────────────────────────┤
-│ [Live Stream] [Cost Analytics] [Model Distribution] [Gov...] │  <- tab bar
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│                        active tab content                   │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Header["🤖 Router Optimization Engine — status banner — Settings"]
+    Ticker["Total Saved · System Tokens · Avg. Cost Reduction · ● LIVE"]
+    Tabs["Live Stream | Cost Analytics | Model Distribution | Governance"]
+    Content["Active tab content"]
+
+    Header --> Ticker --> Tabs --> Content
 ```
 
 ### Header

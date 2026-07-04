@@ -1,4 +1,10 @@
 @* Live Stream tab: searchable routing-entry list on the left, drilldown for the selection on the right. *@
+@if (SelectedOrDefault is null)
+{
+    <div class="h-full flex items-center justify-center text-xs text-slate-500">No routing entries yet.</div>
+    @{ return; }
+}
+
 <div class="flex h-full gap-2 min-h-0">
     @* Left column: stream *@
     <div class="flex flex-col min-h-0" style="width:40%">
@@ -184,17 +190,22 @@
             || e.SessionId.Contains(_search, StringComparison.Ordinal)
             || e.Agent.Contains(_search, StringComparison.OrdinalIgnoreCase));
 
-    private RoutingEntry Selected => Entries.FirstOrDefault(e => e.Id == SelectedId) ?? Entries[0];
+    private RoutingEntry? SelectedOrDefault => Entries.FirstOrDefault(e => e.Id == SelectedId) ?? Entries.FirstOrDefault();
 
-    private decimal PromptPct => Selected.PromptTokens / (decimal)(Selected.PromptTokens + Selected.CompletionTokens) * 100;
+    // Guarded by the @if (SelectedOrDefault is null) { ... return; } check at the top of the markup.
+    private RoutingEntry Selected => SelectedOrDefault!;
 
-    private decimal CompletionPct => 100 - PromptPct;
+    private int TotalTokens => Selected.PromptTokens + Selected.CompletionTokens;
+
+    private decimal PromptPct => TotalTokens == 0 ? 0 : Selected.PromptTokens / (decimal)TotalTokens * 100;
+
+    private decimal CompletionPct => TotalTokens == 0 ? 0 : 100 - PromptPct;
 
     private (string Label, int Value)[] TokenCells =>
     [
         ("Prompt", Selected.PromptTokens),
         ("Completion", Selected.CompletionTokens),
-        ("Total", Selected.PromptTokens + Selected.CompletionTokens),
+        ("Total", TotalTokens),
     ];
 
     private static string Money6(decimal value) => value.ToString("F6", CultureInfo.InvariantCulture);

@@ -26,9 +26,11 @@ internal static class TrayWindowManager
 
     private const uint NIM_ADD = 0x0000;
     private const uint NIM_DELETE = 0x0002;
+    private const uint NIM_SETVERSION = 0x0004;
     private const uint NIF_MESSAGE = 0x0001;
     private const uint NIF_ICON = 0x0002;
     private const uint NIF_TIP = 0x0004;
+    private const uint NOTIFYICON_VERSION_4 = 4;
     private const int IDI_APPLICATION = 32512;
 
     private const uint MF_STRING = 0x0000;
@@ -167,6 +169,11 @@ internal static class TrayWindowManager
         data.hIcon = LoadIconW(IntPtr.Zero, (IntPtr)IDI_APPLICATION);
         data.szTip = "AgenticRouter";
         Shell_NotifyIconW(NIM_ADD, ref data);
+
+        // Opt into the modern notify-icon behavior (consistent callback semantics for double-click vs.
+        // click-and-hold, tooltips, etc. across Windows versions). Must be sent after NIM_ADD.
+        data.uTimeoutOrVersion = NOTIFYICON_VERSION_4;
+        Shell_NotifyIconW(NIM_SETVERSION, ref data);
     }
 
     private static void RemoveTrayIcon()
