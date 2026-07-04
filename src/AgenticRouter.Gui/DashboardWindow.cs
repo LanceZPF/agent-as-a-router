@@ -11,7 +11,7 @@ namespace AgenticRouter.Gui;
 /// </summary>
 internal sealed class DashboardWindow : IDisposable
 {
-    private const string DashboardUrl = "wwwroot/index.html";
+    private const string DashboardRelativePath = "wwwroot/index.html";
 
     private readonly Thread _uiThread;
     private readonly ManualResetEventSlim _windowReady = new(initialState: false);
@@ -57,19 +57,6 @@ internal sealed class DashboardWindow : IDisposable
     {
         try
         {
-            // Photino.Load(string) silently no-ops (leaving no StartUrl set at all) if the file can't be
-            // found, rather than throwing - which otherwise surfaces later as a confusing native
-            // "StartUrl or StartString must be supplied" ArgumentException out of WaitForClose(). Fail
-            // fast here with an actionable message instead.
-            var indexPath = Path.Combine(AppContext.BaseDirectory, DashboardUrl);
-            if (!File.Exists(indexPath))
-            {
-                throw new FileNotFoundException(
-                    $"Dashboard not found at '{indexPath}'. Run `npm install && npm run build` in " +
-                    "src/AgenticRouter.Gui/dashboard/ to generate wwwroot/ before running this app.",
-                    indexPath);
-            }
-
             _window = new PhotinoWindow()
                 .SetTitle("AgenticRouter Dashboard")
                 .SetUseOsDefaultSize(false)
@@ -87,7 +74,7 @@ internal sealed class DashboardWindow : IDisposable
                     NativeMethods.Hide(_window!.WindowHandle);
                     return true; // Cancel the close; hide to tray instead.
                 })
-                .Load(DashboardUrl);
+                .Load(GetDashboardUrl());
 
             _windowReady.Set();
 
@@ -103,6 +90,27 @@ internal sealed class DashboardWindow : IDisposable
             _startupException = ex;
             _windowReady.Set();
         }
+    }
+
+    private static Uri GetDashboardUrl()
+    {
+        // Built by `npm run build` in src/AgenticRouter.Gui/dashboard/ (see vite.config.ts's outDir) -
+        // wwwroot/ is generated and gitignored, so it may not exist yet in a fresh checkout.
+        var indexPath = Path.Combine(AppContext.BaseDirectory, DashboardRelativePath);
+
+        // Photino.Load(string) silently no-ops (leaving no StartUrl set at all) if the file can't be
+        // found, rather than throwing - which otherwise surfaces later as a confusing native "StartUrl or
+        // StartString must be supplied" ArgumentException out of WaitForClose(). Fail fast here instead,
+        // and pass an explicit file:// Uri so there's no ambiguity in how Load() resolves the path.
+        if (!File.Exists(indexPath))
+        {
+            throw new FileNotFoundException(
+                $"Dashboard not found at '{indexPath}'. Run `npm install && npm run build` in " +
+                "src/AgenticRouter.Gui/dashboard/ to generate wwwroot/ before running this app.",
+                indexPath);
+        }
+
+        return new Uri(indexPath, UriKind.Absolute);
     }
 
     public void Dispose()

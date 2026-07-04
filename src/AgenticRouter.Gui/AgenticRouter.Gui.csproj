@@ -15,6 +15,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- dashboard/ is a separate npm-managed subproject (source only - node_modules, .tsx, etc.); it is
+         built by `npm run build` into wwwroot/ (see dashboard/vite.config.ts) and must not be globbed
+         into this project's own item list. -->
+    <Compile Remove="dashboard\**" />
+    <None Remove="dashboard\**" />
+    <Content Remove="dashboard\**" />
+
     <Compile Remove="wwwroot\**" />
     <None Update="wwwroot\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
