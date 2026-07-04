@@ -11,8 +11,6 @@ namespace AgenticRouter.Gui;
 /// </summary>
 internal sealed class DashboardWindow : IDisposable
 {
-    private const string DashboardUrl = "wwwroot/index.html";
-
     private readonly Thread _uiThread;
     private readonly ManualResetEventSlim _windowReady = new(initialState: false);
     private volatile bool _isExiting;
@@ -74,7 +72,7 @@ internal sealed class DashboardWindow : IDisposable
                     NativeMethods.Hide(_window!.WindowHandle);
                     return true; // Cancel the close; hide to tray instead.
                 })
-                .Load(DashboardUrl);
+                .Load(GetDashboardUrl());
         }
         catch (Exception ex)
         {
@@ -89,6 +87,22 @@ internal sealed class DashboardWindow : IDisposable
 
         // Blocks this thread, pumping the native window's message loop, until Exit() closes it for real.
         _window.WaitForClose();
+    }
+
+    private static string GetDashboardUrl()
+    {
+        // Build absolute path from the application's directory
+        var appDirectory = AppContext.BaseDirectory;
+        var dashboardPath = Path.Combine(appDirectory, "dashboard", "index.html");
+
+        // Verify the file exists
+        if (!File.Exists(dashboardPath))
+        {
+            throw new FileNotFoundException($"Dashboard file not found at: {dashboardPath}");
+        }
+
+        // Convert to file:// URL
+        return new Uri(dashboardPath).AbsoluteUri;
     }
 
     public void Dispose()
