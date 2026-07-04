@@ -23,13 +23,37 @@
     <Content Remove="dashboard\**" />
 
     <Compile Remove="wwwroot\**" />
-    <None Update="wwwroot\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+
+    <!-- Build input tracking for BuildDashboardSpa below; excludes node_modules (huge, and irrelevant to
+         whether the built output is stale). -->
+    <DashboardSourceFiles Include="dashboard\**\*.*" Exclude="dashboard\node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Photino.NET" Version="4.0.16" />
   </ItemGroup>
+
+  <!-- Builds the dashboard SPA (React/Vite, under dashboard/) into wwwroot/ before compiling, so a fresh
+       checkout works with a plain `dotnet build`/`dotnet run` and no manual npm step. Requires Node.js/npm
+       on PATH. Skipped automatically once wwwroot/index.html is newer than every file under dashboard/. -->
+  <Target Name="BuildDashboardSpa"
+          BeforeTargets="BeforeBuild"
+          Inputs="@(DashboardSourceFiles)"
+          Outputs="wwwroot\index.html">
+    <Exec Command="npm install"
+          WorkingDirectory="dashboard"
+          Condition="!Exists('dashboard\node_modules')" />
+    <Exec Command="npm run build" WorkingDirectory="dashboard" />
+  </Target>
+
+  <!-- Re-globs wwwroot/ immediately after BuildDashboardSpa, whether it just ran or was skipped as
+       up-to-date. A glob evaluated once at project-load time (e.g. a plain <None Update="wwwroot\**">)
+       would miss freshly generated files or reference stale ones, since Vite's output filenames are
+       content-hashed and change on every real build. -->
+  <Target Name="IncludeDashboardOutput" AfterTargets="BuildDashboardSpa" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot')" />
+    </ItemGroup>
+  </Target>
 
 </Project>

@@ -26,8 +26,11 @@ yet connected to the running AgenticRouter proxy.
 source (React + TypeScript + Vite + Tailwind + Recharts) lives in `dashboard/` and is built directly into
 `wwwroot/` via Vite's `build.outDir`.
 
-Before running or publishing `AgenticRouter.Gui` for the first time, or after changing anything under
-`dashboard/`, build it:
+`AgenticRouter.Gui.csproj` runs `npm install`/`npm run build` in `dashboard/` automatically as part of
+`dotnet build`/`dotnet run` (see the `BuildDashboardSpa` target), so a plain `dotnet run` works from a
+fresh checkout. This requires **Node.js/npm on `PATH`**. It's skipped once `wwwroot/index.html` is newer
+than every file under `dashboard/`, so incremental builds don't re-run npm unnecessarily. To build the
+dashboard manually instead (e.g. to see npm's output directly, or without invoking `dotnet build`):
 
 ```bash
 cd src/AgenticRouter.Gui/dashboard
