@@ -57,6 +57,19 @@ internal sealed class DashboardWindow : IDisposable
     {
         try
         {
+            // Photino.Load(string) silently no-ops (leaving no StartUrl set at all) if the file can't be
+            // found, rather than throwing - which otherwise surfaces later as a confusing native
+            // "StartUrl or StartString must be supplied" ArgumentException out of WaitForClose(). Fail
+            // fast here with an actionable message instead.
+            var indexPath = Path.Combine(AppContext.BaseDirectory, DashboardUrl);
+            if (!File.Exists(indexPath))
+            {
+                throw new FileNotFoundException(
+                    $"Dashboard not found at '{indexPath}'. Run `npm install && npm run build` in " +
+                    "src/AgenticRouter.Gui/dashboard/ to generate wwwroot/ before running this app.",
+                    indexPath);
+            }
+
             _window = new PhotinoWindow()
                 .SetTitle("AgenticRouter Dashboard")
                 .SetUseOsDefaultSize(false)
@@ -75,20 +88,21 @@ internal sealed class DashboardWindow : IDisposable
                     return true; // Cancel the close; hide to tray instead.
                 })
                 .Load(DashboardUrl);
+
+            _windowReady.Set();
+
+            // Blocks this thread, pumping the native window's message loop, until Exit() closes it for real.
+            _window.WaitForClose();
         }
         catch (Exception ex)
         {
             // Unblock the constructor rather than hanging forever if window creation fails (e.g. the
-            // native Photino/WebView2 runtime is missing or misconfigured).
+            // native Photino/WebView2 runtime is missing or misconfigured, or wwwroot/ isn't built yet).
+            // Also catches failures from WaitForClose() itself, which otherwise would go unhandled on
+            // this background thread and crash the whole process.
             _startupException = ex;
             _windowReady.Set();
-            return;
         }
-
-        _windowReady.Set();
-
-        // Blocks this thread, pumping the native window's message loop, until Exit() closes it for real.
-        _window.WaitForClose();
     }
 
     public void Dispose()
