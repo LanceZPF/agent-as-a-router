@@ -49,12 +49,273 @@ public sealed record TokenBucket(string Slot, decimal Prompt, decimal Completion
 /// <summary>Market-share percentage (and display color) for one model.</summary>
 public sealed record ModelShare(string Model, decimal Value, string Color);
 
+/// <summary>A single turn within a conversation (multi-step agentic workflow).</summary>
+public sealed record ConversationTurn(
+    string Id,
+    string Agent,
+    string Model,
+    int TurnNumber,
+    int PromptTokens,
+    int CompletionTokens,
+    decimal RoutingRoi,
+    decimal TotalCost,
+    int ToolExecutionSteps,
+    decimal CacheHitRate,
+    int TimeToFirstTokenMs,
+    decimal ContextBufferPercent,
+    string Timestamp,
+    IReadOnlyList<RoutingStep> RoutingSteps,
+    string? RequestSummary = null,
+    string? ResponseSummary = null);
+
+/// <summary>A conversation/session containing multiple turns.</summary>
+public sealed record Conversation(
+    string Id,
+    string Title,
+    string FirstTimestamp,
+    string LastTimestamp,
+    decimal TotalCost,
+    int TotalPromptTokens,
+    int TotalCompletionTokens,
+    bool HasFallbackTurns,
+    IReadOnlyList<ConversationTurn> Turns);
+
 /// <summary>
 /// Hard-coded mock data for the dashboard. The dashboard is not yet wired up to the live AgenticRouter
 /// proxy; replacing this class with real telemetry is the intended integration seam.
 /// </summary>
 public static class MockData
 {
+    public static readonly IReadOnlyList<Conversation> Conversations =
+    [
+        new(
+            Id: "sess-001",
+            Title: "Code Review Analysis - PR #4521",
+            FirstTimestamp: "14:15:32",
+            LastTimestamp: "14:22:18",
+            TotalCost: 0.045230m,
+            TotalPromptTokens: 12456,
+            TotalCompletionTokens: 3894,
+            HasFallbackTurns: false,
+            Turns:
+            [
+                new(
+                    Id: "turn-001-01",
+                    Agent: "Code Review Bot",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 1,
+                    PromptTokens: 2104,
+                    CompletionTokens: 891,
+                    RoutingRoi: 85.01m,
+                    TotalCost: 0.006310m,
+                    ToolExecutionSteps: 2,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 245,
+                    ContextBufferPercent: 26.2m,
+                    Timestamp: "14:15:32",
+                    RoutingSteps: [
+                        new(StepStatus.Ok, "Code diff parsed (1,234 lines)"),
+                        new(StepStatus.Ok, "claude-3-haiku selected (optimal for code review)"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ]),
+                new(
+                    Id: "turn-001-02",
+                    Agent: "Code Review Bot",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 2,
+                    PromptTokens: 3240,
+                    CompletionTokens: 1205,
+                    RoutingRoi: 84.50m,
+                    TotalCost: 0.009870m,
+                    ToolExecutionSteps: 3,
+                    CacheHitRate: 72m,
+                    TimeToFirstTokenMs: 198,
+                    ContextBufferPercent: 40.5m,
+                    Timestamp: "14:17:45",
+                    RoutingSteps: [
+                        new(StepStatus.Ok, "Conversation history + diff context: 3,240 tokens"),
+                        new(StepStatus.Ok, "Cache hit: 1,847 tokens from prompt cache"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ]),
+                new(
+                    Id: "turn-001-03",
+                    Agent: "Code Review Bot",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 3,
+                    PromptTokens: 4567,
+                    CompletionTokens: 1798,
+                    RoutingRoi: 83.20m,
+                    TotalCost: 0.013820m,
+                    ToolExecutionSteps: 4,
+                    CacheHitRate: 68m,
+                    TimeToFirstTokenMs: 211,
+                    ContextBufferPercent: 57.0m,
+                    Timestamp: "14:19:22",
+                    RoutingSteps: [
+                        new(StepStatus.Ok, "Full conversation history: 4,567 tokens (hockey stick curve visible)"),
+                        new(StepStatus.Ok, "Cache hit: 3,106 tokens from prompt cache"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ]),
+                new(
+                    Id: "turn-001-04",
+                    Agent: "Code Review Bot",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 4,
+                    PromptTokens: 5545,
+                    CompletionTokens: 0,
+                    RoutingRoi: 88.75m,
+                    TotalCost: 0.015230m,
+                    ToolExecutionSteps: 1,
+                    CacheHitRate: 75m,
+                    TimeToFirstTokenMs: 189,
+                    ContextBufferPercent: 69.2m,
+                    Timestamp: "14:22:18",
+                    RoutingSteps: [
+                        new(StepStatus.Ok, "Final summary requested (no completion tokens needed)"),
+                        new(StepStatus.Ok, "Cache hit: 4,159 tokens from prompt cache"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ]),
+            ]),
+        new(
+            Id: "sess-002",
+            Title: "Data Pipeline Debugging - ETL Job #892",
+            FirstTimestamp: "14:08:15",
+            LastTimestamp: "14:14:42",
+            TotalCost: 0.032150m,
+            TotalPromptTokens: 8932,
+            TotalCompletionTokens: 2456,
+            HasFallbackTurns: false,
+            Turns:
+            [
+                new(
+                    Id: "turn-002-01",
+                    Agent: "Data Analyst Wrapper",
+                    Model: "gpt-4o-mini",
+                    TurnNumber: 1,
+                    PromptTokens: 1890,
+                    CompletionTokens: 623,
+                    RoutingRoi: 87.56m,
+                    TotalCost: 0.005340m,
+                    ToolExecutionSteps: 2,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 312,
+                    ContextBufferPercent: 23.4m,
+                    Timestamp: "14:08:15",
+                    RoutingSteps: [
+                        new(StepStatus.Ok, "SQL error log parsed (1,234 lines)"),
+                        new(StepStatus.Ok, "gpt-4o-mini selected for fast SQL analysis"),
+                        new(StepStatus.Info, "Route Confirmed: gpt-4o-mini"),
+                    ]),
+                new(
+                    Id: "turn-002-02",
+                    Agent: "Data Analyst Wrapper",
+                    Model: "gpt-4o-mini",
+                    TurnNumber: 2,
+                    PromptTokens: 3456,
+                    CompletionTokens: 912,
+                    RoutingRoi: 86.20m,
+                    TotalCost: 0.009870m,
+                    ToolExecutionSteps: 3,
+                    CacheHitRate: 45m,
+                    TimeToFirstTokenMs: 267,
+                    ContextBufferPercent: 42.8m,
+                    Timestamp: "14:10:33",
+                    RoutingSteps: [
+                        new(StepStatus.Ok, "Query trace added to context (3,456 tokens total)"),
+                        new(StepStatus.Ok, "Cache hit: 1,555 tokens from prompt cache"),
+                        new(StepStatus.Info, "Route Confirmed: gpt-4o-mini"),
+                    ]),
+                new(
+                    Id: "turn-002-03",
+                    Agent: "Data Analyst Wrapper",
+                    Model: "gpt-4o-mini",
+                    TurnNumber: 3,
+                    PromptTokens: 3586,
+                    CompletionTokens: 921,
+                    RoutingRoi: 85.90m,
+                    TotalCost: 0.010240m,
+                    ToolExecutionSteps: 2,
+                    CacheHitRate: 52m,
+                    TimeToFirstTokenMs: 278,
+                    ContextBufferPercent: 44.3m,
+                    Timestamp: "14:12:47",
+                    RoutingSteps: [
+                        new(StepStatus.Ok, "Solution verification (3,586 tokens)"),
+                        new(StepStatus.Ok, "Cache hit: 1,865 tokens"),
+                        new(StepStatus.Info, "Route Confirmed: gpt-4o-mini"),
+                    ]),
+            ]),
+        new(
+            Id: "sess-003",
+            Title: "Customer Support - Issue #78234",
+            FirstTimestamp: "13:52:10",
+            LastTimestamp: "14:05:33",
+            TotalCost: 0.018945m,
+            TotalPromptTokens: 6234,
+            TotalCompletionTokens: 1845,
+            HasFallbackTurns: true,
+            Turns:
+            [
+                new(
+                    Id: "turn-003-01",
+                    Agent: "Customer Support NLP",
+                    Model: "claude-3-haiku",
+                    TurnNumber: 1,
+                    PromptTokens: 1456,
+                    CompletionTokens: 567,
+                    RoutingRoi: 82.30m,
+                    TotalCost: 0.004560m,
+                    ToolExecutionSteps: 1,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 189,
+                    ContextBufferPercent: 18.0m,
+                    Timestamp: "13:52:10",
+                    RoutingSteps: [
+                        new(StepStatus.Ok, "Customer inquiry parsed"),
+                        new(StepStatus.Ok, "claude-3-haiku selected"),
+                        new(StepStatus.Info, "Route Confirmed: claude-3-haiku"),
+                    ]),
+                new(
+                    Id: "turn-003-02",
+                    Agent: "Customer Support NLP",
+                    Model: "fallback-cheapest-local",
+                    TurnNumber: 2,
+                    PromptTokens: 2389,
+                    CompletionTokens: 734,
+                    RoutingRoi: 0m,
+                    TotalCost: 0.000000m,
+                    ToolExecutionSteps: 2,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 445,
+                    ContextBufferPercent: 29.5m,
+                    Timestamp: "13:54:28",
+                    RoutingSteps: [
+                        new(StepStatus.Warn, "Anthropic budget breached for this hour"),
+                        new(StepStatus.Ok, "Fallback to local model activated"),
+                        new(StepStatus.Info, "Route Confirmed: fallback-cheapest-local"),
+                    ]),
+                new(
+                    Id: "turn-003-03",
+                    Agent: "Customer Support NLP",
+                    Model: "fallback-cheapest-local",
+                    TurnNumber: 3,
+                    PromptTokens: 2389,
+                    CompletionTokens: 544,
+                    RoutingRoi: 0m,
+                    TotalCost: 0.000000m,
+                    ToolExecutionSteps: 1,
+                    CacheHitRate: 0m,
+                    TimeToFirstTokenMs: 512,
+                    ContextBufferPercent: 29.5m,
+                    Timestamp: "14:05:33",
+                    RoutingSteps: [
+                        new(StepStatus.Warn, "Still on fallback due to budget constraints"),
+                        new(StepStatus.Ok, "Local model serving request"),
+                        new(StepStatus.Info, "Route Confirmed: fallback-cheapest-local"),
+                    ]),
+            ]),
+    ];
+
     public static readonly IReadOnlyList<RoutingEntry> Entries =
     [
         new(
