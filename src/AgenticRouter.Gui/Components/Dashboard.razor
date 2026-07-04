@@ -100,7 +100,7 @@
         @switch (_activeTab)
         {
             case Tab.Live:
-                <LiveStream Conversations="MockData.Conversations" SelectedId="@_selectedConversationId" OnSelect="id => _selectedConversationId = id" />
+                <LiveStream Entries="MockData.Entries" SelectedId="@_selectedEntryId" OnSelect="id => _selectedEntryId = id" />
                 break;
             case Tab.Analytics:
                 <CostAnalytics CostData="MockData.CostData" AgentRoi="MockData.AgentRoi" />
@@ -139,7 +139,7 @@
     ];
 
     private Tab _activeTab = Tab.Live;
-    private string _selectedConversationId = MockData.Conversations[0].Id;
+    private string _selectedEntryId = MockData.Entries[0].Id;
     private bool _showSettings;
     private string? _flashId;
 
