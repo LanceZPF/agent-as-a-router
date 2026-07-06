@@ -49,3 +49,89 @@
 .apexcharts-menu {
   display: none !important;
 }
+
+/* ---------------------------------------------------------------------------
+   Live Stream tab: split panels, metric tiles, and helpers. The compiled
+   Tailwind sheet above only contains utilities already used elsewhere, so the
+   Live Stream-specific pieces live here as ls-* classes.
+   --------------------------------------------------------------------------- */
+
+/* Left panel default width; dragging the divider overrides this inline. */
+.ls-left {
+  width: 35%;
+  min-width: 220px;
+}
+
+/* Full-height drag handle between the panels (wired up by js/split-pane.js). */
+.ls-divider {
+  flex: 0 0 8px;
+  margin: 0 2px;
+  cursor: col-resize;
+  border-radius: 4px;
+  position: relative;
+  touch-action: none;
+  transition: background-color 0.15s ease;
+}
+
+.ls-divider:hover,
+.ls-divider.dragging {
+  background: #334155;
+}
+
+.ls-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  border-radius: 1px;
+  background: #475569;
+}
+
+/* Small uppercase label preceding a stat value in the per-turn / summary stat strips. */
+.ls-stat-label {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Elements with a data-tip attribute get a floating tooltip (js/tooltips.js). */
+.ls-tip {
+  cursor: help;
+}
+
+/* The single body-level tooltip element created by js/tooltips.js. */
+.ls-tooltip {
+  position: fixed;
+  z-index: 100;
+  max-width: 280px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #cbd5e1;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Single-line ellipsis (the compiled sheet has no .truncate). min-width:0 lets flex
+   children actually shrink below their content size so the ellipsis kicks in. */
+.ls-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Scrollable request/response payload blocks in the turn drill-down (~8 lines). */
+.ls-payload {
+  max-height: 8rem;
+  overflow-y: auto;
+}
