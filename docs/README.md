@@ -34,8 +34,8 @@ spacing, motion, and component conventions; `dashboard.md` is authoritative for 
 
 | File | Status | What it covers |
 |---|---|---|
-| [`memory-persistence.md`](router/memory-persistence.md) | Implemented (`src/AgenticRouter/Router/{IRouterMemoryStore,JsonRouterMemoryStore,VectorStoreRouterMemoryStore}.cs`) | JSON + optional vector-store persistence for router memory across restarts. |
-| [`serilog-logging-guide.md`](router/serilog-logging-guide.md) | Implemented | Required Serilog structured-logging configuration. |
+| [`memory-persistence.md`](router/memory-persistence.md) | **Partially implemented** | Basic JSON persistence for router memory is real (`Router/{IRouterMemoryStore,JsonRouterMemoryStore,RouterMemory}.cs`) but has no schema versioning, backups, or compaction; the "vector store" (`VectorStoreRouterMemoryStore`) is an in-memory Jaccard-overlap approximation, not a real vector DB, and isn't used by default. |
+| [`serilog-logging-guide.md`](router/serilog-logging-guide.md) | **Partially implemented** | Config-driven Serilog via `appsettings.json` is real, but only a `Console` sink is wired up — the guide's `File`/`EventLog` sinks and package list are the proposed target, not current state. |
 | [`migration-log.md`](router/migration-log.md) | Implemented (historical) | What Phases 0–1 of the Python→C# migration actually changed. |
 | [`system-proxy-architecture.md`](router/system-proxy-architecture.md) | **Proposed — not implemented** | OS-level system-proxy interception design (registry/WinInet), modeled on `cc-switch`. What's actually implemented today is a plain local HTTP reverse proxy (`src/AgenticRouter/Proxy/`). |
 | [`proxy-coexistence.md`](router/proxy-coexistence.md) | **Proposed — not implemented** | Design for detecting/backing up/chaining through an existing corporate proxy or VPN. No such code exists yet. |
