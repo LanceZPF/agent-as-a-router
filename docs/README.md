@@ -21,8 +21,13 @@ Matches the real, implemented app: a **.NET MAUI Blazor Hybrid** project at
 
 | File | What it covers |
 |---|---|
-| [`dashboard.md`](gui/dashboard.md) | Full prose spec of every tab, card, and interaction — the canonical reference for what the dashboard does today. |
+| [`dashboard.md`](gui/dashboard.md) | Full prose spec of every tab, card, and interaction — the canonical reference for what the dashboard does today, including which parts now read live telemetry vs. mock data. |
 | [`livestream-redesign-plan.md`](gui/livestream-redesign-plan.md) | Design log for the Live Stream tab's conversation/turn-centric revision: context, decisions, and the rationale for departures from earlier iterations. |
+| [`backlog.md`](gui/backlog.md) | Not-yet-implemented work: the smaller gaps still unblocked by live proxy integration, plus deferred/optional items called out in the redesign plan. |
+
+The live-telemetry pipeline itself (proxy-side capture, SignalR transport, GUI-side aggregation) is
+documented in [`router/telemetry.md`](router/telemetry.md), not here, since most of it lives in
+`src/AgenticRouter/`.
 
 **Visual/brand authority:** [`design/`](design/) is a separate, tool-generated design system
 (components, tokens, guideline cards, a `SKILL.md` for prototyping) derived from `dashboard.md`
@@ -35,6 +40,7 @@ spacing, motion, and component conventions; `dashboard.md` is authoritative for 
 | File | Status | What it covers |
 |---|---|---|
 | [`memory-persistence.md`](router/memory-persistence.md) | **Partially implemented** | Basic JSON persistence for router memory is real (`Router/{IRouterMemoryStore,JsonRouterMemoryStore,RouterMemory}.cs`) but has no schema versioning, backups, or compaction; the "vector store" (`VectorStoreRouterMemoryStore`) is an in-memory Jaccard-overlap approximation, not a real vector DB, and isn't used by default. |
+| [`telemetry.md`](router/telemetry.md) | **Implemented (unverified)** | Per-request routing telemetry (`Telemetry/`): session/turn tracking, OpenAI/Anthropic token-usage extraction (streaming + non-streaming), static pricing, and a SignalR hub pushing events to `AgenticRouter.Gui`'s Live Stream and Cost Analytics tabs. Server-side has unit tests; nothing in this repo's environment has been compiled to confirm they pass. |
 | [`serilog-logging-guide.md`](router/serilog-logging-guide.md) | **Partially implemented** | Config-driven Serilog via `appsettings.json` is real, but only a `Console` sink is wired up — the guide's `File`/`EventLog` sinks and package list are the proposed target, not current state. |
 | [`migration-log.md`](router/migration-log.md) | Implemented (historical) | What Phases 0–1 of the Python→C# migration actually changed. |
 | [`system-proxy-architecture.md`](router/system-proxy-architecture.md) | **Proposed — not implemented** | OS-level system-proxy interception design (registry/WinInet), modeled on `cc-switch`. What's actually implemented today is a plain local HTTP reverse proxy (`src/AgenticRouter/Proxy/`). |

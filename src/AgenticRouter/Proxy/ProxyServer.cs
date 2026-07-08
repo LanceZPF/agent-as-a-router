@@ -1,7 +1,9 @@
+using AgenticRouter.Telemetry;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,6 +20,7 @@ namespace AgenticRouter.Proxy
     public class ProxyServer
     {
         private readonly IHost _host;
+        private readonly TelemetryPublisher? _telemetryPublisher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyServer"/> class.
@@ -34,12 +37,22 @@ namespace AgenticRouter.Proxy
         /// tests to avoid flaking when the default port is already in use); the resolved address is available via
         /// <see cref="Addresses"/> once <see cref="StartAsync"/> completes.
         /// </param>
-        public ProxyServer(ILogger<ProxyServer> logger, ProxyMiddleware proxyMiddleware, int port = 5001)
+        /// <param name="telemetryPublisher">
+        /// The outer application's <see cref="TelemetryPublisher"/> singleton (see its remarks for why this needs
+        /// to be the concrete type, not <see cref="ITelemetryPublisher"/>: <see cref="StartAsync"/> attaches the
+        /// inner host's real <see cref="IHubContext{TelemetryHub}"/> to it once Kestrel is listening). Optional and
+        /// defaults to <see langword="null"/> so existing callers/tests that construct a plain proxy-forwarding
+        /// server, with no telemetry hub, are unaffected; when null, the Kestrel pipeline still adds routing and
+        /// maps <c>/telemetry/hub</c> (so the endpoint always exists), it just has nothing to attach events to.
+        /// </param>
+        public ProxyServer(ILogger<ProxyServer> logger, ProxyMiddleware proxyMiddleware, int port = 5001, TelemetryPublisher? telemetryPublisher = null)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(proxyMiddleware);
             ArgumentOutOfRangeException.ThrowIfNegative(port);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(port, 65535);
+
+            _telemetryPublisher = telemetryPublisher;
 
             _host = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -60,8 +73,18 @@ namespace AgenticRouter.Proxy
                         }
                     });
 
+                    // SignalR is registered into this inner host's own DI container (deliberately separate from
+                    // the outer application container - see the constructor remarks above), not the outer one.
+                    webBuilder.ConfigureServices(services => services.AddSignalR());
+
                     webBuilder.Configure(app =>
                     {
+                        // UseRouting + a mapped hub handles only requests matching /telemetry/hub (and its
+                        // SignalR negotiate/connect sub-paths); every other request - which is all real LLM API
+                        // traffic - falls through unmatched to the terminal app.Run below, completely unchanged
+                        // from before this endpoint existed.
+                        app.UseRouting();
+                        app.UseEndpoints(endpoints => endpoints.MapHub<TelemetryHub>("/telemetry/hub"));
                         app.Run(context => proxyMiddleware.InvokeAsync(context, _ => Task.CompletedTask));
                     });
                 })
@@ -81,11 +104,16 @@ namespace AgenticRouter.Proxy
         }
 
         /// <summary>
-        /// Starts the proxy server.
+        /// Starts the proxy server. Once Kestrel is listening, connects the outer application's
+        /// <see cref="TelemetryPublisher"/> (if one was supplied) to this instance's real
+        /// <see cref="IHubContext{TelemetryHub}"/>, so <see cref="Proxy.ProxyMiddleware"/> (constructed in
+        /// the outer container, before this inner host existed) can publish through it.
         /// </summary>
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            return _host.StartAsync(cancellationToken);
+            await _host.StartAsync(cancellationToken);
+
+            _telemetryPublisher?.AttachHubContext(_host.Services.GetRequiredService<IHubContext<TelemetryHub>>());
         }
 
         /// <summary>

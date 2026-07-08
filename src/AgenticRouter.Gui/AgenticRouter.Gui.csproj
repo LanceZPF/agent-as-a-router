@@ -37,6 +37,16 @@
          AddApexChartsMaui() and bundles its JS as static web assets, so it works offline in the
          BlazorWebView. -->
     <PackageReference Include="Blazor-ApexCharts-MAUI" Version="6.1.0" />
+    <!-- SignalR client: connects to the AgenticRouter proxy's /telemetry/hub for live routing
+         telemetry (see Services/LiveDataStore.cs). -->
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Plain net10.0 libraries: pure data-transformation logic kept out of this Windows-only
+         project so it's unit-testable on any platform. See the matching .Tests projects. -->
+    <ProjectReference Include="..\AgenticRouter.Gui.Charts\AgenticRouter.Gui.Charts.csproj" />
+    <ProjectReference Include="..\AgenticRouter.Gui.Telemetry\AgenticRouter.Gui.Telemetry.csproj" />
   </ItemGroup>
 
 </Project>

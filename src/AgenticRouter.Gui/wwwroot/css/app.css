@@ -99,12 +99,22 @@
   white-space: nowrap;
 }
 
-/* Elements with a data-tip attribute get a floating tooltip (js/tooltips.js). */
+/* Elements with a data-tip attribute get a floating tooltip (js/tooltips.js). Each also carries
+   aria-describedby="ls-tooltip" and, if not already focusable, tabindex="0" in the markup, so the
+   tooltip is reachable by keyboard/screen-reader users the same way it's reachable by mouse. */
 .ls-tip {
   cursor: help;
 }
 
-/* The single body-level tooltip element created by js/tooltips.js. */
+.ls-tip:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* The single body-level tooltip element created by js/tooltips.js. Hidden via opacity rather than
+   display:none: display:none removes an element from the accessibility tree, which would silently
+   break the aria-describedby relationship on every .ls-tip element. */
 .ls-tooltip {
   position: fixed;
   z-index: 100;
@@ -119,6 +129,12 @@
   line-height: 1.4;
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.ls-tooltip.visible {
+  opacity: 1;
 }
 
 /* Single-line ellipsis (the compiled sheet has no .truncate). min-width:0 lets flex

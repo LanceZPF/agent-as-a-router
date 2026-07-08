@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Plain net10.0 (not net10.0-windows / MAUI), mirroring AgenticRouter.Gui.Charts: DTOs and pure
+         aggregation logic shared with the Gui, with no Blazor/MAUI/SignalR dependency, so it builds
+         and unit-tests on any platform. Deliberately does not reference the AgenticRouter proxy
+         project - the DTO here is an independent copy of the wire shape, matching how the GUI and
+         proxy are two separately deployable processes that only share a JSON contract over SignalR,
+         not compiled types. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AgenticRouter.Gui.Telemetry</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

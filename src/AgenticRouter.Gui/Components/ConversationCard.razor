@@ -1,5 +1,10 @@
-@* One conversation (session) in the Live Stream left panel. *@
+@* One conversation (session) in the Live Stream left panel. The data-tip spans inside this button
+   are mouse-hover-only informational text (no tabindex): nesting a focusable element inside a
+   <button> is an ARIA anti-pattern, so screen readers instead get the same facts via this button's
+   aria-label; sighted keyboard users already see all the values as plain text. *@
 <button @onclick="() => OnSelect.InvokeAsync(Conversation.Id)"
+        aria-label="@AriaLabel"
+        aria-pressed="@IsSelected"
         class="w-full text-left rounded card-hover"
         style="background:@(IsSelected ? "#263548" : "#1e293b");
                border:1px solid @(IsSelected ? "#38bdf8" : "#334155");
@@ -64,6 +69,16 @@
     public EventCallback<string> OnSelect { get; set; }
 
     private List<string> DistinctAgents => Conversation.Turns.Select(t => t.Agent).Distinct().ToList();
+
+    // Screen-reader equivalent of the card's visible data-tip spans (see the accessibility note in
+    // the markup above for why those spans aren't independently focusable).
+    private string AriaLabel =>
+        $"{Conversation.Title}" +
+        (Conversation.HasFallbackTurns ? ", fallback routing used" : string.Empty) +
+        $". {Conversation.FirstTimestamp} to {Conversation.LastTimestamp}. " +
+        $"Cost ${Conversation.TotalCost.ToString("F6", CultureInfo.InvariantCulture)}, " +
+        $"{FormatTokens(Conversation.TotalPromptTokens + Conversation.TotalCompletionTokens)} tokens, " +
+        $"{Conversation.Turns.Count} {(Conversation.Turns.Count == 1 ? "turn" : "turns")}.";
 
     private static string FormatTokens(int tokens) => tokens switch
     {

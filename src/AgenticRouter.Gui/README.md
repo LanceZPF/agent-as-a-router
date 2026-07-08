@@ -17,9 +17,14 @@ does not start, stop, or otherwise manage it.
 
 ## Current limitations
 
-The dashboard displays hard-coded mock data (see `Models/DashboardData.cs`) - it is not yet connected to
-the running AgenticRouter proxy. Replacing `MockData` with real telemetry is the intended integration
-seam.
+The Live Stream tab and the Cost Analytics tab's Token Compounding chart connect to the running
+AgenticRouter proxy's telemetry hub (`Services/LiveDataStore.cs`, default
+`http://localhost:5001/telemetry/hub`, not yet configurable) and show nothing until the proxy is
+reachable and has forwarded at least one request. The rest of the dashboard (Model Distribution,
+Governance, the header ticker, and Cost Analytics' other two charts) still reads from hard-coded
+mock data (`Models/DashboardData.cs`) - no telemetry source exists for that data yet. See
+[`docs/router/telemetry.md`](../../docs/router/telemetry.md) for the full pipeline and
+[`docs/gui/backlog.md`](../../docs/gui/backlog.md) for what's left.
 
 ## Project layout
 
@@ -28,6 +33,8 @@ seam.
 | `App.cs`, `MainPage.cs`, `MauiProgram.cs` | MAUI shell: one window hosting a full-window `BlazorWebView`. |
 | `Components/` | The dashboard's Razor components (tabs, cards, settings modal, icons). |
 | `Models/DashboardData.cs` | Dashboard data model + the mock data. |
+| `Services/LiveDataStore.cs` | SignalR client connecting to the proxy's telemetry hub; accumulates and re-aggregates live routing events into `Conversation`/`ConversationTurn` records. |
+| `Services/LiveConversationMapper.cs` | Maps `AgenticRouter.Gui.Telemetry`'s live-aggregation output onto the dashboard's `Conversation`/`ConversationTurn` view-model shape, with honest defaults for fields telemetry doesn't cover. |
 | `Platforms/Windows/TrayWindowManager.cs` | Win32 tray icon + WndProc subclass implementing the tray-resident window behavior (MAUI has no built-in tray support). |
 | `wwwroot/` | Blazor host page and the dashboard stylesheet (`css/app.css`). Static source - no build step. |
 
