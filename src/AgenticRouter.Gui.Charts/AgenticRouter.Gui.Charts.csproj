@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Plain net10.0 (not net10.0-windows / MAUI): pure data-transformation logic shared by the
+         Gui's charts, with no Blazor/MAUI dependency, so it builds and unit-tests on any platform
+         (including this repo's Linux CI/agent environment) even though AgenticRouter.Gui itself is
+         Windows-only. See AgenticRouter.Gui.Charts.Tests for coverage. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AgenticRouter.Gui.Charts</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

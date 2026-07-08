@@ -103,7 +103,7 @@
                 <LiveStream Conversations="MockData.Conversations" SelectedId="@_selectedConversationId" OnSelect="id => _selectedConversationId = id" />
                 break;
             case Tab.Analytics:
-                <CostAnalytics CostData="MockData.CostData" AgentRoi="MockData.AgentRoi" />
+                <CostAnalytics CostData="MockData.CostData" AgentRoi="MockData.AgentRoi" Conversations="MockData.Conversations" />
                 break;
             case Tab.Distribution:
                 <ModelDistribution TokenBuckets="MockData.TokenBuckets" ModelShares="MockData.ModelShares" />

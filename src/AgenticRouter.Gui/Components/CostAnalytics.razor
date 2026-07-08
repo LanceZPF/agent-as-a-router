@@ -1,7 +1,9 @@
-@* Cost Analytics tab: cumulative savings line chart plus a per-agent ROI horizontal bar chart. *@
+@* Cost Analytics tab: cumulative savings line chart, a per-agent ROI horizontal bar chart, and a
+   per-conversation token-compounding line chart (the "hockey stick" curve deferred here from the
+   Live Stream redesign). *@
 <div class="h-full flex flex-col gap-3 min-h-0">
     @* Cumulative Savings chart *@
-    <div class="rounded-lg p-4 shrink-0 flex flex-col" style="background:#1e293b;border:1px solid #334155;height:48%">
+    <div class="rounded-lg p-4 shrink-0 flex flex-col" style="background:#1e293b;border:1px solid #334155;height:34%">
         <div class="flex items-baseline justify-between mb-3 shrink-0">
             <div>
                 <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Cumulative Savings</div>
@@ -25,7 +27,7 @@
     </div>
 
     @* ROI per Agent chart *@
-    <div class="rounded-lg p-4 flex-1 min-h-0 flex flex-col" style="background:#1e293b;border:1px solid #334155">
+    <div class="rounded-lg p-4 shrink-0 flex flex-col" style="background:#1e293b;border:1px solid #334155;height:28%">
         <div class="mb-3 shrink-0">
             <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest">ROI by Agent</div>
             <div class="text-xs text-slate-600 mt-0.5">Cost reduction % per operational agent</div>
@@ -41,6 +43,57 @@
             </ApexChart>
         </div>
     </div>
+
+    @* Token Compounding by Conversation chart *@
+    <div class="rounded-lg p-4 flex-1 min-h-0 flex flex-col" style="background:#1e293b;border:1px solid #334155">
+        <div class="flex items-center justify-between mb-3 shrink-0">
+            <div>
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Token Compounding by Conversation</div>
+                <div class="flex items-center gap-4 mt-1.5">
+                    <span class="flex items-center gap-1.5 text-xs font-mono text-slate-500">
+                        <span class="w-2 h-2 rounded-sm" style="background:#38bdf8"></span> Cumulative Prompt
+                    </span>
+                    <span class="flex items-center gap-1.5 text-xs font-mono text-slate-500">
+                        <span class="w-2 h-2 rounded-sm" style="background:#10b981"></span> Cumulative Completion
+                    </span>
+                </div>
+            </div>
+            <select value="@_selectedConversationId"
+                    @onchange="OnConversationChanged"
+                    class="rounded px-2 py-1.5 text-xs font-mono"
+                    style="background:#0f172a;border:1px solid #334155;color:#e2e8f0">
+                @foreach (var conversation in Conversations)
+                {
+                    <option value="@conversation.Id">@conversation.Title</option>
+                }
+            </select>
+        </div>
+        @if (_compoundingSeries.Count == 0)
+        {
+            <div class="flex-1 flex items-center justify-center text-xs text-slate-500">No conversation selected.</div>
+        }
+        else
+        {
+            <div class="flex-1 min-h-0">
+                <ApexChart TItem="CompoundingPoint" Options="_compoundingOptions" Height="@("100%")">
+                    <ApexPointSeries TItem="CompoundingPoint"
+                                     Items="_compoundingSeries"
+                                     Name="Cumulative Prompt"
+                                     SeriesType="SeriesType.Line"
+                                     Color="#38bdf8"
+                                     XValue="e => e.TurnNumber"
+                                     YValue="e => e.CumulativePromptTokens" />
+                    <ApexPointSeries TItem="CompoundingPoint"
+                                     Items="_compoundingSeries"
+                                     Name="Cumulative Completion"
+                                     SeriesType="SeriesType.Line"
+                                     Color="#10b981"
+                                     XValue="e => e.TurnNumber"
+                                     YValue="e => e.CumulativeCompletionTokens" />
+                </ApexChart>
+            </div>
+        }
+    </div>
 </div>
 
 @code {
@@ -50,8 +103,15 @@
     [Parameter, EditorRequired]
     public IReadOnlyList<AgentRoi> AgentRoi { get; set; } = [];
 
+    [Parameter, EditorRequired]
+    public IReadOnlyList<Conversation> Conversations { get; set; } = [];
+
     private ApexChartOptions<CostDataPoint> _lineOptions = new();
     private ApexChartOptions<AgentRoi> _barOptions = new();
+    private ApexChartOptions<CompoundingPoint> _compoundingOptions = new();
+
+    private string _selectedConversationId = string.Empty;
+    private IReadOnlyList<CompoundingPoint> _compoundingSeries = [];
 
     protected override void OnInitialized()
     {
@@ -178,5 +238,84 @@
                 },
             ],
         };
+
+        _compoundingOptions = new ApexChartOptions<CompoundingPoint>
+        {
+            Chart = new Chart
+            {
+                Toolbar = new Toolbar { Show = false },
+                Background = "transparent",
+                ForeColor = "#475569",
+                FontFamily = "JetBrains Mono, monospace",
+                Animations = new Animations { Enabled = false },
+            },
+            Stroke = new Stroke { Curve = Curve.MonotoneCubic, Width = 2 },
+            DataLabels = new DataLabels { Enabled = false },
+            Legend = new Legend { Show = false },
+            Grid = new Grid
+            {
+                BorderColor = "#1e3a5f",
+                StrokeDashArray = 3,
+            },
+            Tooltip = new Tooltip
+            {
+                Theme = Mode.Dark,
+                Y = new TooltipY { Formatter = "function (value) { return value.toLocaleString(); }" },
+            },
+            Xaxis = new XAxis
+            {
+                TickAmount = 6,
+                AxisBorder = new AxisBorder { Show = false },
+                AxisTicks = new AxisTicks { Show = false },
+                Labels = new XAxisLabels
+                {
+                    Style = new AxisLabelStyle { FontSize = "10px" },
+                },
+            },
+            Yaxis =
+            [
+                new YAxis
+                {
+                    Labels = new YAxisLabels
+                    {
+                        Style = new AxisLabelStyle { FontSize = "10px" },
+                        Formatter = "function (value) { return value >= 1000 ? (value / 1000).toFixed(1) + 'K' : value; }",
+                    },
+                },
+            ],
+        };
+
+        if (Conversations.Count > 0)
+        {
+            _selectedConversationId = Conversations[0].Id;
+        }
+
+        RecomputeCompoundingSeries();
+    }
+
+    protected override void OnParametersSet()
+    {
+        RecomputeCompoundingSeries();
+    }
+
+    private void OnConversationChanged(ChangeEventArgs e)
+    {
+        _selectedConversationId = (string?)e.Value ?? string.Empty;
+        RecomputeCompoundingSeries();
+    }
+
+    private void RecomputeCompoundingSeries()
+    {
+        var conversation = Conversations.FirstOrDefault(c => c.Id == _selectedConversationId);
+        if (conversation is null)
+        {
+            _compoundingSeries = [];
+            return;
+        }
+
+        var turns = conversation.Turns
+            .Select(t => new TurnTokenPoint(t.TurnNumber, t.PromptTokens, t.CompletionTokens))
+            .ToList();
+        _compoundingSeries = TokenCompoundingSeries.Build(turns);
     }
 }

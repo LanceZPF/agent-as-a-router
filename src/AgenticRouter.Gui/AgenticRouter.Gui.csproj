@@ -39,4 +39,10 @@
     <PackageReference Include="Blazor-ApexCharts-MAUI" Version="6.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Plain net10.0 library: chart data-transformation logic, kept out of this Windows-only
+         project so it's unit-testable on any platform. See AgenticRouter.Gui.Charts.Tests. -->
+    <ProjectReference Include="..\AgenticRouter.Gui.Charts\AgenticRouter.Gui.Charts.csproj" />
+  </ItemGroup>
+
 </Project>

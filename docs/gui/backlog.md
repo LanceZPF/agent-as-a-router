@@ -1,13 +1,14 @@
 # AgenticRouter.Gui: Not-Yet-Implemented Work
 
 A backlog of gaps between what the GUI docs describe/design and what `src/AgenticRouter.Gui/`
-actually does today. Sourced from explicit statements in [`dashboard.md`](dashboard.md)'s "Known
-gaps" section, [`src/AgenticRouter.Gui/README.md`](../../src/AgenticRouter.Gui/README.md)'s
+actually does today. Originally sourced from explicit statements in [`dashboard.md`](dashboard.md)'s
+"Known gaps" section, [`src/AgenticRouter.Gui/README.md`](../../src/AgenticRouter.Gui/README.md)'s
 "Current limitations," and deferred/optional items in
-[`livestream-redesign-plan.md`](livestream-redesign-plan.md). Nothing here is inferred from code
-archaeology alone — every item is a gap the docs themselves call out.
+[`livestream-redesign-plan.md`](livestream-redesign-plan.md).
 
-## 1. Wire the dashboard to live AgenticRouter proxy telemetry (headline item)
+## Open
+
+### 1. Wire the dashboard to live AgenticRouter proxy telemetry (headline item)
 
 Every tab currently reads from the static `MockData` class in `Models/DashboardData.cs`; nothing
 in the GUI talks to the running `AgenticRouter` proxy. This is the root cause of most of the
@@ -29,35 +30,44 @@ smaller gaps below — each is really "this can't be real until #1 exists":
 - **Settings modal actions** — Reset Stats / Clear History currently just close the modal with no
   effect; they need real actions once there's real state to reset or clear.
 
-## 2. Real-time auto-refresh / streaming updates (Live Stream)
+No telemetry-capture/exposure layer exists in `src/AgenticRouter/` today (no history endpoint, no
+push transport) — this item requires proxy-side work, not just GUI-side wiring.
+
+### 2. Real-time auto-refresh / streaming updates (Live Stream)
 
 The original redesign plan specified a **live** dashboard: auto-refresh every 1–2 seconds, new
 turns appearing at the bottom of the list without a page reload, and selection persistence across
 updates. None of that is implemented — the app loads mock data once and stays static. Distinct
 from item 1 (which is about the data *source*): this is about push/poll *mechanics* on top of a
-live source, and would need designing regardless of how #1 is solved (SignalR? polling? something
-else against the eventual telemetry API).
+live source. Preferred direction (per 2026-07-08 discussion): push via SignalR/WebSocket from the
+proxy once item 1's telemetry layer exists, rather than polling.
 
-## 3. Token-compounding line chart in Cost Analytics
+## Recently completed
 
-The Live Stream redesign plan explicitly deferred this: *"the line chart showing token compounding
-by conversation should appear in the Cost Analytics tab, NOT in Live Stream. That's a separate
-task."* Cost Analytics today only has the cumulative-savings line chart and the agent-ROI bar
-chart — no per-turn "hockey stick" comparison view showing how a single conversation's token/cost
-usage compounds turn over turn.
+### ✅ Token-compounding line chart in Cost Analytics
 
-## 4. Token-compounding sparkline on the conversation summary card
+Implemented in `CostAnalytics.razor`'s new "Token Compounding by Conversation" panel: a
+conversation picker over `MockData.Conversations` plus a two-series line chart (cumulative prompt
+tokens, cumulative completion tokens) per turn, built via
+`AgenticRouter.Gui.Charts.TokenCompoundingSeries.Build`.
 
-Flagged as an **"(optional enhancement)"** in the redesign plan: a small sparkline/mini-chart on
-`ConversationSummary.razor` showing token growth across the selected conversation's turns, so the
-compounding trend is visible without scrolling the full turn list. Not built.
+### ✅ Token-compounding sparkline on the conversation summary card
 
-## 5. Keyboard-accessible tooltips
+Implemented in `ConversationSummary.razor`: a compact inline SVG polyline ("Trend" stat) showing
+per-turn total tokens, built via `AgenticRouter.Gui.Charts.TokenCompoundingSeries.BuildSparkline`
+and `SparklineLayout.Normalize`.
 
-The redesign plan calls for tooltip keyboard accessibility (`aria-describedby` support for screen
-readers). The shipped `wwwroot/js/tooltips.js` only responds to `mouseover`/`mouseleave` — there's
-no `focus`/`blur` handling, so a keyboard-only user tabbing through the dashboard can't trigger any
-`data-tip` tooltip.
+### ✅ Keyboard-accessible tooltips
+
+`wwwroot/js/tooltips.js` now shows/hides on `focusin`/`focusout` (in addition to hover), dismisses
+on Escape, and the shared tooltip element is hidden via opacity rather than `display:none` so it
+stays in the accessibility tree. Every `data-tip` element not nested inside a `<button>` carries
+`tabindex="0"` and `aria-describedby="ls-tooltip"`. The handful nested inside a `<button>` (e.g. a
+`TurnCard` header's sub-badges) intentionally skip `tabindex` — nesting a focusable element inside a
+button is an ARIA anti-pattern — and the outer button carries a comprehensive `aria-label` instead.
+Smoke-tested against a standalone HTML harness with Playwright/Chromium (see `dashboard.md`'s
+"Verification limitation" note for why that, rather than a full app build, was the verification
+method available in this environment).
 
 ## Minor / cosmetic (low priority)
 
