@@ -1,4 +1,7 @@
 @* Root dashboard component: header with live status banner, ticker row, tab bar, and the active tab. *@
+@implements IDisposable
+@inject LiveDataStore LiveDataStore
+
 <div class="flex flex-col h-screen overflow-hidden" style="background:#0f172a">
     @* ── HEADER ── *@
     <header style="background:#1e293b;border-bottom:1px solid #334155">
@@ -100,10 +103,10 @@
         @switch (_activeTab)
         {
             case Tab.Live:
-                <LiveStream Conversations="MockData.Conversations" SelectedId="@_selectedConversationId" OnSelect="id => _selectedConversationId = id" />
+                <LiveStream Conversations="LiveDataStore.Conversations" SelectedId="@_selectedConversationId" OnSelect="id => _selectedConversationId = id" />
                 break;
             case Tab.Analytics:
-                <CostAnalytics CostData="MockData.CostData" AgentRoi="MockData.AgentRoi" Conversations="MockData.Conversations" />
+                <CostAnalytics CostData="MockData.CostData" AgentRoi="MockData.AgentRoi" Conversations="LiveDataStore.Conversations" />
                 break;
             case Tab.Distribution:
                 <ModelDistribution TokenBuckets="MockData.TokenBuckets" ModelShares="MockData.ModelShares" />
@@ -139,14 +142,16 @@
     ];
 
     private Tab _activeTab = Tab.Live;
-    private string _selectedConversationId = MockData.Conversations.Count > 0 ? MockData.Conversations[0].Id : string.Empty;
+    // Live Stream starts empty (no telemetry received yet); LiveStream.razor auto-selects the first
+    // conversation once one arrives, so an empty starting id is correct rather than a mock fallback.
+    private string _selectedConversationId = string.Empty;
     private bool _showSettings;
     private string? _flashId;
 
     private List<Provider> _breached = [];
     private List<Provider> _approaching = [];
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _breached = MockData.Providers.Where(p => p.CurrentSpend / p.BudgetCap >= 1).ToList();
         _approaching = MockData.Providers
@@ -156,7 +161,16 @@
                 return pct >= 0.8m && pct < 1;
             })
             .ToList();
+
+        LiveDataStore.Changed += HandleLiveDataChanged;
+        await LiveDataStore.StartAsync();
     }
+
+    // LiveDataStore raises Changed from whatever thread SignalR delivered the event on; InvokeAsync
+    // marshals back to this component's render context before calling StateHasChanged.
+    private void HandleLiveDataChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => LiveDataStore.Changed -= HandleLiveDataChanged;
 
     // Clicking the alert banner jumps to Governance and briefly flashes the offending provider card.
     private async Task HandleAlertClick()

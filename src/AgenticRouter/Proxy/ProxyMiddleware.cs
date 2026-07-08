@@ -1,7 +1,12 @@
+using System.Buffers;
+using System.Diagnostics;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using AgenticRouter.Telemetry;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net.Http;
 using System.Collections.Generic;
 
@@ -39,9 +44,21 @@ public class ProxyMiddleware : IMiddleware
     // single upstream to forward it to anyway when ModelList spans multiple providers.
     private const string ModelsListPath = "/v1/models";
 
+    // Cap on how much of the response body telemetry captures for usage parsing (see CopyAndCaptureAsync).
+    // Real chat/completion responses are almost always well under this; a response that exceeds it just
+    // means usage parsing has less to work with (a truncated/partial buffer that the usage parsers already
+    // handle gracefully by finding nothing), never a failure of the actual client-facing forward, which is
+    // unaffected by this cap - every byte is still copied to the client regardless.
+    private const int MaxCapturedResponseBytes = 4 * 1024 * 1024;
+
     private readonly ILogger<ProxyMiddleware> _logger;
     private readonly HttpClient _httpClient;
     private readonly RequestInterceptor _interceptor;
+    private readonly ISessionIdResolver _sessionIdResolver;
+    private readonly IConversationTurnTracker _turnTracker;
+    private readonly IUsageExtractor _usageExtractor;
+    private readonly ITelemetryPublisher _telemetryPublisher;
+    private readonly PricingOptions _pricingOptions;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyMiddleware"/> class.
@@ -49,7 +66,20 @@ public class ProxyMiddleware : IMiddleware
     /// <param name="logger">Logger instance.</param>
     /// <param name="interceptor">Request/response interceptor.</param>
     /// <param name="httpClient">Optional HTTP client used for forwarding requests.</param>
-    public ProxyMiddleware(ILogger<ProxyMiddleware> logger, RequestInterceptor interceptor, HttpClient? httpClient = null)
+    /// <param name="sessionIdResolver">Optional session-id resolver; defaults to <see cref="SessionIdResolver"/>.</param>
+    /// <param name="turnTracker">Optional turn tracker; defaults to a fresh <see cref="ConversationTurnTracker"/> private to this instance.</param>
+    /// <param name="usageExtractor">Optional usage extractor; defaults to <see cref="UsageExtractor"/>.</param>
+    /// <param name="telemetryPublisher">Optional telemetry publisher; defaults to a fresh, unattached <see cref="TelemetryPublisher"/> (a safe no-op until attached).</param>
+    /// <param name="pricingOptions">Optional pricing configuration; defaults to an empty <see cref="PricingOptions"/> (cost is then always reported as unknown).</param>
+    public ProxyMiddleware(
+        ILogger<ProxyMiddleware> logger,
+        RequestInterceptor interceptor,
+        HttpClient? httpClient = null,
+        ISessionIdResolver? sessionIdResolver = null,
+        IConversationTurnTracker? turnTracker = null,
+        IUsageExtractor? usageExtractor = null,
+        ITelemetryPublisher? telemetryPublisher = null,
+        IOptions<PricingOptions>? pricingOptions = null)
     {
         _logger = logger;
         _interceptor = interceptor;
@@ -58,6 +88,11 @@ public class ProxyMiddleware : IMiddleware
             AllowAutoRedirect = false,
             UseCookies = false
         });
+        _sessionIdResolver = sessionIdResolver ?? new SessionIdResolver();
+        _turnTracker = turnTracker ?? new ConversationTurnTracker();
+        _usageExtractor = usageExtractor ?? new UsageExtractor();
+        _telemetryPublisher = telemetryPublisher ?? new TelemetryPublisher();
+        _pricingOptions = pricingOptions?.Value ?? new PricingOptions();
     }
 
     /// <inheritdoc />
@@ -113,7 +148,9 @@ public class ProxyMiddleware : IMiddleware
             requestMessage.Headers.TryAddWithoutValidation(route.AuthHeaderName, route.AuthHeaderValue);
         }
 
+        var stopwatch = Stopwatch.StartNew();
         using var responseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
+        var latencyToHeadersMs = stopwatch.ElapsedMilliseconds;
 
         var responseHopByHopHeaders = GetHopByHopHeaderNames(responseMessage.Headers.Connection);
 
@@ -138,9 +175,130 @@ public class ProxyMiddleware : IMiddleware
             context.Response.Headers[header.Key] = header.Value.ToArray();
         }
 
-        await responseMessage.Content.CopyToAsync(context.Response.Body);
+        var isStreaming = string.Equals(responseMessage.Content.Headers.ContentType?.MediaType, "text/event-stream", StringComparison.OrdinalIgnoreCase);
+
+        byte[] capturedResponseBytes;
+        using (var upstreamBody = await responseMessage.Content.ReadAsStreamAsync(context.RequestAborted))
+        {
+            capturedResponseBytes = await CopyAndCaptureAsync(upstreamBody, context.Response.Body, MaxCapturedResponseBytes, context.RequestAborted);
+        }
+
+        var totalDurationMs = stopwatch.ElapsedMilliseconds;
 
         await _interceptor.InterceptResponseAsync(context);
+
+        // Telemetry is best-effort observability layered on top of an already-completed forward: every
+        // byte of the response has already reached the client by this point, and any failure here
+        // (malformed JSON, an extractor throwing, a disconnected dashboard) must never surface as a
+        // proxy error.
+        try
+        {
+            await PublishTelemetryAsync(context, route, resolution.RewrittenBody!, capturedResponseBytes, isStreaming, latencyToHeadersMs, totalDurationMs, (int)responseMessage.StatusCode, context.RequestAborted);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Failed to publish routing telemetry; the forwarded response was unaffected.");
+        }
+    }
+
+    private async Task PublishTelemetryAsync(
+        HttpContext context,
+        ResolvedModelRoute route,
+        byte[] rewrittenRequestBody,
+        byte[] capturedResponseBytes,
+        bool isStreaming,
+        long latencyToHeadersMs,
+        long totalDurationMs,
+        int statusCode,
+        CancellationToken cancellationToken)
+    {
+        var requestBody = TryParseJsonObject(rewrittenRequestBody);
+        var resolvedSessionId = _sessionIdResolver.Resolve(context.Request.Headers, requestBody);
+
+        var isSynthesized = resolvedSessionId is null;
+        var sessionId = resolvedSessionId ?? Guid.NewGuid().ToString("N");
+        var turnNumber = _turnTracker.NextTurn(sessionId);
+
+        var requestedModel = route.ModelName;
+        var isFallback = false; // No fallback-routing concept exists in ModelRouteResolver today; reserved for when one does.
+
+        int? promptTokens = null;
+        int? completionTokens = null;
+        decimal? estimatedCostUsd = null;
+
+        if (_usageExtractor.TryExtractUsage(route.Provider, isStreaming, capturedResponseBytes, out var usage))
+        {
+            promptTokens = usage.PromptTokens;
+            completionTokens = usage.CompletionTokens;
+
+            if (_pricingOptions.Models.TryGetValue(requestedModel, out var price))
+            {
+                estimatedCostUsd = price.EstimateCost(usage.PromptTokens, usage.CompletionTokens);
+            }
+        }
+
+        var telemetryEvent = new RoutingTelemetryEvent(
+            SessionId: sessionId,
+            TurnNumber: turnNumber,
+            IsSessionSynthesized: isSynthesized,
+            RequestedModel: requestedModel,
+            ResolvedModel: route.ProviderModelId,
+            Provider: route.Provider,
+            IsFallback: isFallback,
+            PromptTokens: promptTokens,
+            CompletionTokens: completionTokens,
+            EstimatedCostUsd: estimatedCostUsd,
+            IsStreaming: isStreaming,
+            LatencyToHeadersMs: latencyToHeadersMs,
+            TotalDurationMs: totalDurationMs,
+            StatusCode: statusCode,
+            TimestampUtc: DateTimeOffset.UtcNow);
+
+        await _telemetryPublisher.PublishAsync(telemetryEvent, cancellationToken);
+    }
+
+    private static JsonObject? TryParseJsonObject(byte[] bytes)
+    {
+        try
+        {
+            return JsonNode.Parse(bytes) as JsonObject;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Copies <paramref name="source"/> to <paramref name="destination"/> unchanged (the client-facing
+    /// forward), while also capturing up to <paramref name="captureCap"/> bytes for telemetry usage
+    /// parsing. The capture never delays or alters what reaches <paramref name="destination"/> - it's an
+    /// in-memory side copy of each chunk immediately after (not instead of) writing it downstream.
+    /// </summary>
+    private static async Task<byte[]> CopyAndCaptureAsync(Stream source, Stream destination, int captureCap, CancellationToken cancellationToken)
+    {
+        using var capture = new MemoryStream();
+        var buffer = ArrayPool<byte>.Shared.Rent(81920);
+        try
+        {
+            int bytesRead;
+            while ((bytesRead = await source.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken)) > 0)
+            {
+                await destination.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
+
+                var remainingCapacity = captureCap - (int)capture.Length;
+                if (remainingCapacity > 0)
+                {
+                    await capture.WriteAsync(buffer.AsMemory(0, Math.Min(bytesRead, remainingCapacity)), cancellationToken);
+                }
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+
+        return capture.ToArray();
     }
 
     /// <summary>

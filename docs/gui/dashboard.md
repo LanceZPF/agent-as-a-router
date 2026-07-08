@@ -10,9 +10,14 @@ The dashboard presents routing, cost, and governance telemetry for the AgenticRo
 requests were routed to which upstream model, how much that saved versus a worst-case baseline, token
 volume trends, model market share, and per-provider budget status.
 
-**Current status: all data is hard-coded mock data** (`Models/DashboardData.cs`). Nothing in the
-dashboard reads from the live `AgenticRouter` proxy yet - it is a UI/UX shell to be wired up to real
-telemetry in a later change.
+**Current status: mixed live and mock data.** The **Live Stream** tab and the **Cost Analytics** tab's
+Token Compounding chart are wired to live telemetry pushed from the `AgenticRouter` proxy over
+SignalR (`Services/LiveDataStore.cs`) - see [`../router/telemetry.md`](../router/telemetry.md) for
+the full pipeline. Until the proxy is running and reachable (or before it has forwarded any
+requests), those two surfaces simply show no conversations rather than falling back to mock data.
+Model Distribution, Governance, the header ticker, and Cost Analytics' other two charts (Cumulative
+Savings, ROI by Agent) still read from the hard-coded `MockData` class - no telemetry source exists
+for that data yet (see `../gui/backlog.md`).
 
 ## Stack
 
@@ -82,8 +87,10 @@ flowchart TD
 1. **Live Stream** (`LiveStream.razor`, default tab) - a conversation-centric two-panel view. The
    panels are adjustable split panes: a full-height divider between them can be dragged to resize
    (pointer handling in `wwwroot/js/split-pane.js`; left panel defaults to 35% width, clamped 20-65%).
-   - Left panel (`ConversationCard.razor`): a searchable, scrollable list of conversations
-     (`MockData.Conversations`). Each card shows the conversation title, first → last turn timestamps,
+   - Left panel (`ConversationCard.razor`): a searchable, scrollable list of conversations, sourced
+     live from `Services/LiveDataStore.cs` (empty until the proxy has forwarded at least one
+     request; see [`../router/telemetry.md`](../router/telemetry.md)). Each card shows the
+     conversation title, first → last turn timestamps,
      total session cost, total tokens (K/M notation), turn count, and color-dotted names of the first
      two distinct agents; conversations containing fallback turns get an amber `⚠` badge and left
      border. Search filters by title, session ID, agent name, or model name.
@@ -122,10 +129,11 @@ flowchart TD
    - A cumulative savings line chart over time (`MockData.CostData`), with a dark tooltip.
    - A horizontal bar chart of cost-reduction % by agent (`MockData.AgentRoi`), bars colored by reduction
      tier (≥85% green, ≥70% blue, else amber), with the percentage labeled at the end of each bar.
-   - **Token Compounding by Conversation**: a conversation picker (`<select>` over `MockData.Conversations`)
-     above a two-series line chart - cumulative prompt tokens (sky) and cumulative completion tokens
-     (green) per turn - showing the "hockey stick" curve for the selected conversation. The series is
-     computed by `AgenticRouter.Gui.Charts.TokenCompoundingSeries.Build`, which turns the conversation's
+   - **Token Compounding by Conversation**: a conversation picker (`<select>`, live conversations
+     from `Services/LiveDataStore.cs` - same source as the Live Stream tab) above a two-series line
+     chart - cumulative prompt tokens (sky) and cumulative completion tokens (green) per turn -
+     showing the "hockey stick" curve for the selected conversation. The series is computed by
+     `AgenticRouter.Gui.Charts.TokenCompoundingSeries.Build`, which turns the conversation's
      `ConversationTurn`s into a running cumulative sum ordered by turn number. This was explicitly
      deferred here from the Live Stream tab during that redesign (see `livestream-redesign-plan.md`).
 
@@ -151,16 +159,21 @@ action is actually wired to real data yet - confirming just closes the modal.
 
 ## Data model (`Models/DashboardData.cs`)
 
-All dashboard state is derived from seven mock collections on the static `MockData` class, typed via
-C# records:
+`Conversation`/`ConversationTurn` are shared between mock and live data: `MockData.Conversations`
+populates them by hand; `Services/LiveDataStore.cs` populates them from proxy telemetry via
+`Services/LiveConversationMapper.cs` (see [`../router/telemetry.md`](../router/telemetry.md) for the
+full pipeline, and that file's table of which `ConversationTurn` fields are real vs. honestly
+defaulted in live mode - the record shape itself hasn't changed). The other five collections below
+remain mock-only; typed via C# records:
 
-- `MockData.Conversations: Conversation[]` - conversations (sessions) for the Live Stream tab: title,
-  first/last timestamps, aggregate cost/token totals, a fallback flag, and an ordered list of
-  `ConversationTurn`s. Each turn carries the per-turn metrics (prompt/completion tokens, routing ROI,
-  cost, tool execution steps, cache hit rate, TTFT, context buffer %), its `RoutingSteps` log,
-  optional plain-text request/response excerpts (the request excerpt doubles as the turn card title),
-  and a fallback flag. The mock turns' prompt tokens grow turn-over-turn to demonstrate token
-  compounding.
+- `MockData.Conversations: Conversation[]` - three hand-written sample conversations, used only as a
+  design/layout reference now that the Live Stream tab reads live data; kept for local UI
+  development when no proxy is running. Each has a title, first/last timestamps, aggregate
+  cost/token totals, a fallback flag, and an ordered list of `ConversationTurn`s carrying the
+  per-turn metrics (prompt/completion tokens, routing ROI, cost, tool execution steps, cache hit
+  rate, TTFT, context buffer %), a `RoutingSteps` log, optional plain-text request/response excerpts
+  (the request excerpt doubles as the turn card title), and a fallback flag. The mock turns' prompt
+  tokens grow turn-over-turn to demonstrate token compounding.
 - `MockData.Entries: RoutingEntry[]` - individual routing decisions (session/trace IDs, agent, model,
   fallback flag, token counts, actual vs. worst-case cost, savings, timestamp, and an ordered
   `RoutingSteps` log). No longer rendered by the Live Stream tab, but kept as the entry-level
@@ -205,10 +218,21 @@ These match the source design as received and are called out so they aren't mist
 - The chart tooltips use ApexCharts' dark theme (restyled in `app.css` to match the card styling) rather
   than the fully custom tooltips of the original React implementation - minor visual differences are
   expected there.
+- The telemetry hub URL (`http://localhost:5001/telemetry/hub`) is hardcoded to the proxy's default
+  port in `Services/LiveDataStore.cs` - there's no settings UI yet to point the GUI at a
+  differently-configured proxy.
+- Several `ConversationTurn` fields have no live-data source and are shown as their "nothing to
+  report" state (e.g. ROI/cache rate render as `—`) when viewing live conversations: Routing ROI,
+  Tool Steps, Cache Hit Rate, Context Buffer, and Request/Response text. See
+  [`../router/telemetry.md`](../router/telemetry.md)'s field table for why each one, and Time to
+  First Token for the one turn-level field that *is* real in live mode.
 - **Verification limitation**: this repo's Linux CI/agent environment has no .NET SDK and cannot
   install one (network policy blocks the installer), so `AgenticRouter.Gui`'s Razor/C# changes are
-  necessarily review-verified rather than compiled or run. The two exceptions: `AgenticRouter.Gui.Charts`
-  (a plain `net10.0` library, unit-tested - see above) and `wwwroot/js/tooltips.js`'s keyboard-focus
-  behavior, which was smoke-tested against a standalone HTML harness with Playwright/Chromium (both
-  available in this environment independent of the .NET toolchain). A full build/run pass on a
-  Windows machine (or CI with the MAUI workload) is still needed before trusting this compiles clean.
+  necessarily review-verified rather than compiled or run. The exceptions: `AgenticRouter.Gui.Charts`
+  and `AgenticRouter.Gui.Telemetry` (plain `net10.0` libraries, unit-tested - see above and
+  `../router/telemetry.md`) and `wwwroot/js/tooltips.js`'s keyboard-focus behavior, which was
+  smoke-tested against a standalone HTML harness with Playwright/Chromium (both available in this
+  environment independent of the .NET toolchain). `Services/LiveDataStore.cs` and
+  `Services/LiveConversationMapper.cs` are Windows/MAUI-only glue and, like the Razor components,
+  are not unit-tested here for the same reason. A full build/run pass on a Windows machine (or CI
+  with the MAUI workload) is still needed before trusting any of this compiles clean.

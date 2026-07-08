@@ -1,4 +1,5 @@
 using AgenticRouter.Proxy;
+using AgenticRouter.Telemetry;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -413,6 +414,190 @@ public class ProxyMiddlewareTests
         await middleware.InvokeAsync(context, _ => Task.CompletedTask);
 
         Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
+    }
+
+    // Covers the telemetry integration added to ProxyMiddleware: session resolution from a request
+    // header, turn tracking, provider-aware usage extraction from the (non-streaming) upstream
+    // response body, and publishing the resulting event - all layered on top of forwarding behavior
+    // that is otherwise unchanged from the tests above.
+    [Fact]
+    public async Task InvokeAsync_SuccessfulNonStreamingOpenAiResponse_PublishesRoutingTelemetryEvent()
+    {
+        var resolver = ModelRouteResolverTestFactory.Create(
+            modelName: "gpt-5.4",
+            providerModelId: "gpt-5.4-2026-01",
+            baseUrl: "https://example.com",
+            providerName: "openai");
+        var interceptor = new RequestInterceptor(Mock.Of<ILogger<RequestInterceptor>>(), resolver);
+
+        var handler = new DelegatingHandlerStub(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                """{"id":"chatcmpl-1","choices":[],"usage":{"prompt_tokens":42,"completion_tokens":7,"total_tokens":49}}""",
+                Encoding.UTF8,
+                "application/json"),
+        }));
+
+        var telemetryPublisherMock = new Mock<ITelemetryPublisher>();
+        var middleware = new ProxyMiddleware(
+            Mock.Of<ILogger<ProxyMiddleware>>(),
+            interceptor,
+            new HttpClient(handler),
+            telemetryPublisher: telemetryPublisherMock.Object);
+
+        var context = new DefaultHttpContext();
+        context.Request.Method = HttpMethods.Post;
+        context.Request.Scheme = "https";
+        context.Request.Host = new HostString("127.0.0.1:5001");
+        context.Request.Path = "/chat";
+        context.Request.Headers["x-claude-code-session-id"] = "sess-42";
+        var requestBody = Encoding.UTF8.GetBytes("""{"model":"gpt-5.4"}""");
+        context.Request.Body = new MemoryStream(requestBody);
+        context.Request.ContentLength = requestBody.Length;
+        context.Response.Body = new MemoryStream();
+
+        await middleware.InvokeAsync(context, _ => Task.CompletedTask);
+
+        telemetryPublisherMock.Verify(
+            p => p.PublishAsync(
+                It.Is<RoutingTelemetryEvent>(e =>
+                    e.SessionId == "sess-42" &&
+                    e.TurnNumber == 1 &&
+                    !e.IsSessionSynthesized &&
+                    e.RequestedModel == "gpt-5.4" &&
+                    e.ResolvedModel == "gpt-5.4-2026-01" &&
+                    e.Provider == "openai" &&
+                    e.PromptTokens == 42 &&
+                    e.CompletionTokens == 7 &&
+                    !e.IsStreaming &&
+                    e.StatusCode == 200),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    // A second request in the same session must be turn 2, not a fresh turn 1 - confirms the turn
+    // tracker is a shared, stateful dependency across calls on the same middleware instance, not
+    // reset per-request.
+    [Fact]
+    public async Task InvokeAsync_SecondRequestInSameSession_IsTurnTwo()
+    {
+        var resolver = ModelRouteResolverTestFactory.Create(
+            modelName: "gpt-5.4",
+            providerModelId: "gpt-5.4-2026-01",
+            baseUrl: "https://example.com",
+            providerName: "openai");
+        var interceptor = new RequestInterceptor(Mock.Of<ILogger<RequestInterceptor>>(), resolver);
+        var handler = new DelegatingHandlerStub(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") }));
+
+        var telemetryPublisherMock = new Mock<ITelemetryPublisher>();
+        var middleware = new ProxyMiddleware(
+            Mock.Of<ILogger<ProxyMiddleware>>(),
+            interceptor,
+            new HttpClient(handler),
+            telemetryPublisher: telemetryPublisherMock.Object);
+
+        async Task SendOnceAsync()
+        {
+            var context = new DefaultHttpContext();
+            context.Request.Method = HttpMethods.Post;
+            context.Request.Scheme = "https";
+            context.Request.Host = new HostString("127.0.0.1:5001");
+            context.Request.Path = "/chat";
+            context.Request.Headers["x-claude-code-session-id"] = "sess-repeat";
+            var requestBody = Encoding.UTF8.GetBytes("""{"model":"gpt-5.4"}""");
+            context.Request.Body = new MemoryStream(requestBody);
+            context.Request.ContentLength = requestBody.Length;
+            context.Response.Body = new MemoryStream();
+
+            await middleware.InvokeAsync(context, _ => Task.CompletedTask);
+        }
+
+        await SendOnceAsync();
+        await SendOnceAsync();
+
+        telemetryPublisherMock.Verify(p => p.PublishAsync(It.Is<RoutingTelemetryEvent>(e => e.TurnNumber == 1), It.IsAny<CancellationToken>()), Times.Once);
+        telemetryPublisherMock.Verify(p => p.PublishAsync(It.Is<RoutingTelemetryEvent>(e => e.TurnNumber == 2), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    // No session id anywhere in the request: the middleware must still publish (a synthesized,
+    // single-turn "session"), not silently drop telemetry for sessionless requests.
+    [Fact]
+    public async Task InvokeAsync_NoResolvableSessionId_PublishesWithSynthesizedSingleTurnSession()
+    {
+        var resolver = ModelRouteResolverTestFactory.Create(
+            modelName: "gpt-5.4",
+            providerModelId: "gpt-5.4-2026-01",
+            baseUrl: "https://example.com",
+            providerName: "openai");
+        var interceptor = new RequestInterceptor(Mock.Of<ILogger<RequestInterceptor>>(), resolver);
+        var handler = new DelegatingHandlerStub(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") }));
+
+        var telemetryPublisherMock = new Mock<ITelemetryPublisher>();
+        var middleware = new ProxyMiddleware(
+            Mock.Of<ILogger<ProxyMiddleware>>(),
+            interceptor,
+            new HttpClient(handler),
+            telemetryPublisher: telemetryPublisherMock.Object);
+
+        var context = new DefaultHttpContext();
+        context.Request.Method = HttpMethods.Post;
+        context.Request.Scheme = "https";
+        context.Request.Host = new HostString("127.0.0.1:5001");
+        context.Request.Path = "/chat";
+        var requestBody = Encoding.UTF8.GetBytes("""{"model":"gpt-5.4"}""");
+        context.Request.Body = new MemoryStream(requestBody);
+        context.Request.ContentLength = requestBody.Length;
+        context.Response.Body = new MemoryStream();
+
+        await middleware.InvokeAsync(context, _ => Task.CompletedTask);
+
+        telemetryPublisherMock.Verify(
+            p => p.PublishAsync(
+                It.Is<RoutingTelemetryEvent>(e => e.IsSessionSynthesized && e.TurnNumber == 1 && !string.IsNullOrEmpty(e.SessionId)),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    // A publisher failure must never surface as a proxy error: the client-facing response is
+    // unaffected regardless of what telemetry publishing does.
+    [Fact]
+    public async Task InvokeAsync_TelemetryPublisherThrows_ClientResponseIsStillCorrect()
+    {
+        var resolver = ModelRouteResolverTestFactory.Create(
+            modelName: "gpt-5.4",
+            providerModelId: "gpt-5.4-2026-01",
+            baseUrl: "https://example.com",
+            providerName: "openai");
+        var interceptor = new RequestInterceptor(Mock.Of<ILogger<RequestInterceptor>>(), resolver);
+        var handler = new DelegatingHandlerStub(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.Accepted) { Content = new StringContent("forwarded") }));
+
+        var telemetryPublisherMock = new Mock<ITelemetryPublisher>();
+        telemetryPublisherMock
+            .Setup(p => p.PublishAsync(It.IsAny<RoutingTelemetryEvent>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("boom"));
+
+        var middleware = new ProxyMiddleware(
+            Mock.Of<ILogger<ProxyMiddleware>>(),
+            interceptor,
+            new HttpClient(handler),
+            telemetryPublisher: telemetryPublisherMock.Object);
+
+        var context = new DefaultHttpContext();
+        context.Request.Method = HttpMethods.Post;
+        context.Request.Scheme = "https";
+        context.Request.Host = new HostString("127.0.0.1:5001");
+        context.Request.Path = "/chat";
+        var requestBody = Encoding.UTF8.GetBytes("""{"model":"gpt-5.4"}""");
+        context.Request.Body = new MemoryStream(requestBody);
+        context.Request.ContentLength = requestBody.Length;
+        context.Response.Body = new MemoryStream();
+
+        await middleware.InvokeAsync(context, _ => Task.CompletedTask);
+
+        Assert.Equal(StatusCodes.Status202Accepted, context.Response.StatusCode);
+        context.Response.Body.Position = 0;
+        using var reader = new StreamReader(context.Response.Body, Encoding.UTF8);
+        Assert.Equal("forwarded", await reader.ReadToEndAsync(TestContext.Current.CancellationToken));
     }
 
     private sealed class DelegatingHandlerStub : HttpMessageHandler

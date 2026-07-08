@@ -8,47 +8,54 @@ actually does today. Originally sourced from explicit statements in [`dashboard.
 
 ## Open
 
-### 1. Wire the dashboard to live AgenticRouter proxy telemetry (headline item)
+### 1. Extend live telemetry to the rest of the dashboard
 
-Every tab currently reads from the static `MockData` class in `Models/DashboardData.cs`; nothing
-in the GUI talks to the running `AgenticRouter` proxy. This is the root cause of most of the
-smaller gaps below — each is really "this can't be real until #1 exists":
+Live Stream and Cost Analytics' Token Compounding chart now read live data (see "Recently
+completed" below and [`../router/telemetry.md`](../router/telemetry.md)); everything else still
+reads `MockData` because no telemetry source exists for it yet:
 
-- **Live Stream** — real `Conversation`/`ConversationTurn` data instead of the three hand-written
-  mock conversations.
-- **Cost Analytics** — real cumulative-savings time series and per-agent ROI instead of
-  `MockData.CostData`/`AgentRoi`.
+- **Cost Analytics' other two charts** — real cumulative-savings time series and per-agent ROI
+  instead of `MockData.CostData`/`AgentRoi`. Cumulative savings needs a "worst case" baseline cost
+  concept that doesn't exist in `ModelRouteResolver` today (the same gap that keeps per-turn
+  `RoutingRoi` at 0 in live conversations); per-agent ROI has no "agent" concept upstream of "which
+  model was selected" (see the "Agent = Model" note in `telemetry.md`).
 - **Model Distribution** — real `TokenBucket`/`ModelShare` data. The Day/Month/3-Month/6-Month/Year
   time-range filter bar and the From/To date inputs are currently **cosmetic only** — they don't
   refilter the charts — and only become meaningful once there's real time-series data to filter.
 - **Governance** — real per-provider budget/spend data. The Budget Cap input is editable today but
   purely client-side: edits recompute the in-memory utilization/status/bar but aren't persisted
   anywhere and are lost on refresh; needs a real place to write to.
+- **Header ticker** (Total Saved / System Tokens / Avg. Cost Reduction) — still three hardcoded
+  numbers, not derived from `LiveDataStore.Conversations` at all.
 - **Dynamic chart axis ranges** — axis scales (e.g. the $0–$160 savings scale, the 0–6M token
   scale) are currently pinned to fit the mock data's known range; need to become dynamic once real
   data volume varies.
 - **Settings modal actions** — Reset Stats / Clear History currently just close the modal with no
   effect; they need real actions once there's real state to reset or clear.
-
-No telemetry-capture/exposure layer exists in `src/AgenticRouter/` today (no history endpoint, no
-push transport) — this item requires proxy-side work, not just GUI-side wiring.
-
-### 2. Real-time auto-refresh / streaming updates (Live Stream)
-
-The original redesign plan specified a **live** dashboard: auto-refresh every 1–2 seconds, new
-turns appearing at the bottom of the list without a page reload, and selection persistence across
-updates. None of that is implemented — the app loads mock data once and stays static. Distinct
-from item 1 (which is about the data *source*): this is about push/poll *mechanics* on top of a
-live source. Preferred direction (per 2026-07-08 discussion): push via SignalR/WebSocket from the
-proxy once item 1's telemetry layer exists, rather than polling.
+- **Configurable telemetry hub URL** — `Services/LiveDataStore.cs` hardcodes
+  `http://localhost:5001/telemetry/hub`; there's no settings UI to point at a
+  differently-configured proxy, since the GUI has no settings-persistence mechanism at all yet.
 
 ## Recently completed
+
+### ✅ Wire the dashboard to live AgenticRouter proxy telemetry, with real-time push updates
+
+`src/AgenticRouter/Telemetry/` now captures per-request session/turn tracking, OpenAI/Anthropic
+token usage (streaming and non-streaming), and estimated cost, and pushes each request as a
+`RoutingTelemetryEvent` over a SignalR hub (`/telemetry/hub`) as soon as it's forwarded — no polling.
+`AgenticRouter.Gui`'s `Services/LiveDataStore.cs` consumes this live, and the Live Stream tab plus
+Cost Analytics' Token Compounding chart now render real conversations instead of `MockData`. Full
+pipeline, field-by-field data provenance, and what's still honestly defaulted (Routing ROI, Tool
+Steps, Cache Hit Rate, Context Buffer, Request/Response text) vs. real (Time to First Token) is in
+[`../router/telemetry.md`](../router/telemetry.md). This closes out both former "Open" headline
+items (live wiring and real-time push) in one implementation, since SignalR push was the chosen
+transport from the start rather than adding polling first.
 
 ### ✅ Token-compounding line chart in Cost Analytics
 
 Implemented in `CostAnalytics.razor`'s new "Token Compounding by Conversation" panel: a
-conversation picker over `MockData.Conversations` plus a two-series line chart (cumulative prompt
-tokens, cumulative completion tokens) per turn, built via
+conversation picker (now over live conversations, see the live-telemetry item above) plus a
+two-series line chart (cumulative prompt tokens, cumulative completion tokens) per turn, built via
 `AgenticRouter.Gui.Charts.TokenCompoundingSeries.Build`.
 
 ### ✅ Token-compounding sparkline on the conversation summary card
