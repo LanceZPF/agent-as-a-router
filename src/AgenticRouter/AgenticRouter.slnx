@@ -1,5 +1,9 @@
 <Solution>
   <Project Path="../AgenticRouter.Gui/AgenticRouter.Gui.csproj" />
+  <Project Path="../AgenticRouter.Gui.Charts/AgenticRouter.Gui.Charts.csproj" />
+  <Project Path="../AgenticRouter.Gui.Charts.Tests/AgenticRouter.Gui.Charts.Tests.csproj" />
+  <Project Path="../AgenticRouter.Gui.Telemetry/AgenticRouter.Gui.Telemetry.csproj" />
+  <Project Path="../AgenticRouter.Gui.Telemetry.Tests/AgenticRouter.Gui.Telemetry.Tests.csproj" />
   <Project Path="../AgenticRouter.Tests/AgenticRouter.Tests.csproj" Id="6bc19e70-13cf-4f60-91c9-7282407a6ff6" />
   <Project Path="AgenticRouter.csproj" />
 </Solution>
