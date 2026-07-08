@@ -7,10 +7,15 @@ namespace AgenticRouter.Gui.Charts;
 public readonly record struct TurnTokenPoint(int TurnNumber, int PromptTokens, int CompletionTokens);
 
 /// <summary>One point on the cumulative token-compounding line chart.</summary>
+/// <remarks>
+/// A reference-type record (not a <c>record struct</c>) because Blazor-ApexCharts' <c>ApexChart&lt;TItem&gt;</c>/
+/// <c>ApexChartOptions&lt;TItem&gt;</c>/<c>ApexPointSeries&lt;TItem&gt;</c> constrain <c>TItem</c> to <c>class</c>,
+/// matching the other chart item types in <c>Models/DashboardData.cs</c> (<c>CostDataPoint</c>, <c>AgentRoi</c>, etc.).
+/// </remarks>
 /// <param name="TurnNumber">The turn this point represents.</param>
 /// <param name="CumulativePromptTokens">Prompt tokens summed over this turn and all prior turns.</param>
 /// <param name="CumulativeCompletionTokens">Completion tokens summed over this turn and all prior turns.</param>
-public readonly record struct CompoundingPoint(int TurnNumber, int CumulativePromptTokens, int CumulativeCompletionTokens)
+public sealed record CompoundingPoint(int TurnNumber, int CumulativePromptTokens, int CumulativeCompletionTokens)
 {
     /// <summary>Cumulative prompt + completion tokens at this turn.</summary>
     public int CumulativeTotalTokens => CumulativePromptTokens + CumulativeCompletionTokens;
