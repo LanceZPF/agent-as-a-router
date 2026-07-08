@@ -23,6 +23,7 @@ Matches the real, implemented app: a **.NET MAUI Blazor Hybrid** project at
 |---|---|
 | [`dashboard.md`](gui/dashboard.md) | Full prose spec of every tab, card, and interaction — the canonical reference for what the dashboard does today. |
 | [`livestream-redesign-plan.md`](gui/livestream-redesign-plan.md) | Design log for the Live Stream tab's conversation/turn-centric revision: context, decisions, and the rationale for departures from earlier iterations. |
+| [`backlog.md`](gui/backlog.md) | Not-yet-implemented work: live proxy integration and the smaller gaps that unblocks, plus deferred/optional items called out in the redesign plan. |
 
 **Visual/brand authority:** [`design/`](design/) is a separate, tool-generated design system
 (components, tokens, guideline cards, a `SKILL.md` for prototyping) derived from `dashboard.md`
