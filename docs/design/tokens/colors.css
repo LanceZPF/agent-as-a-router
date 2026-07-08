@@ -1,0 +1,80 @@
+/* ==========================================================================
+   AgenticRouter — Color tokens
+   Source of truth: src/AgenticRouter.Gui/wwwroot/css/app.css (compiled Tailwind
+   output of the dashboard's dark theme) + docs/agenticrouter-gui-dashboard.md
+   "Visual theme" section, from davidpizon/agent-as-a-router.
+   Dark theme only — the product has no light mode / no theme toggle.
+   ========================================================================== */
+
+:root {
+  /* ---- Slate scale (base neutrals, exact Tailwind slate values used) ---- */
+  --slate-50:  #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+
+  /* ---- Status / accent hues (exact hex used across the dashboard) ---- */
+  --sky-400:     #38bdf8; /* accent / info / active nav */
+  --emerald-400: #34d399; /* positive text */
+  --emerald-500: #10b981; /* positive fill (savings, OK dot) */
+  --amber-400:   #fbbf24; /* warning text */
+  --amber-500:   #f59e0b; /* warning fill / breach flash */
+  --red-400:     #f87171; /* critical text */
+  --red-500:     #ef4444; /* critical fill / breach flash */
+
+  /* ---- Agent color palette (deterministic FNV-1a hash → color, Utils/ColorUtils.cs) ---- */
+  --agent-1:  #10b981; /* emerald */
+  --agent-2:  #38bdf8; /* cyan */
+  --agent-3:  #818cf8; /* indigo */
+  --agent-4:  #fb7185; /* rose */
+  --agent-5:  #f59e0b; /* amber */
+  --agent-6:  #a78bfa; /* purple */
+  --agent-7:  #14b8a6; /* teal */
+  --agent-8:  #0ea5e9; /* sky */
+  --agent-9:  #6366f1; /* indigo-2 */
+  --agent-10: #ec4899; /* pink */
+  --agent-11: #f97316; /* orange */
+  --agent-12: #06b6d4; /* cyan-2 */
+
+  /* ---- Semantic surface aliases ---- */
+  --surface-page:      var(--slate-900); /* #0f172a page background */
+  --surface-card:      var(--slate-800); /* #1e293b cards, header, nav, modals */
+  --surface-card-hover: #263548;         /* .card-hover:hover exact value */
+  --surface-inset:     var(--slate-900); /* inputs, progress track base */
+  --surface-track:     #1e3a5f;          /* .progress-bar-track background */
+
+  /* ---- Semantic border aliases ---- */
+  --border-default: var(--slate-700);       /* #334155 */
+  --border-subtle:  #33415580;              /* slate-700/50 */
+  --border-strong:  var(--slate-600);       /* #475569 */
+  --border-warning:  #f59e0b66;             /* amber-500/40 */
+  --border-critical: #ef444466;             /* red-500/40 */
+
+  /* ---- Semantic text aliases (descending emphasis) ---- */
+  --text-primary:   var(--slate-200); /* #e2e8f0 */
+  --text-secondary: var(--slate-400); /* #94a3b8 */
+  --text-tertiary:  var(--slate-500); /* #64748b */
+  --text-muted:     var(--slate-600); /* #475569 */
+  --text-heading:   var(--slate-100); /* #f1f5f9 */
+
+  /* ---- Semantic status aliases ---- */
+  --status-ok-text:       var(--emerald-400);
+  --status-ok-fill:       var(--emerald-500);
+  --status-warn-text:     var(--amber-400);
+  --status-warn-fill:     var(--amber-500);
+  --status-critical-text: var(--red-400);
+  --status-critical-fill: var(--red-500);
+  --status-info-text:     var(--sky-400);
+
+  /* ---- Interaction state aliases ---- */
+  --state-hover-bg:    var(--slate-700);
+  --state-hover-amber: #f59e0b1a; /* amber-500/10 */
+  --state-hover-red:   #ef44441a; /* red-500/10 */
+  --focus-ring:        var(--sky-400);
+}

@@ -1,0 +1,9 @@
+/* ==========================================================================
+   AgenticRouter — Webfonts
+   The source repo does not vendor font binaries; Inter + JetBrains Mono are
+   both open-source and available on Google Fonts, so they're loaded from
+   there rather than substituted. If you'd rather self-host, drop the .woff2
+   files in assets/fonts/ and replace this @import with local @font-face rules.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');

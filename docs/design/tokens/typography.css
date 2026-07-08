@@ -1,0 +1,33 @@
+/* ==========================================================================
+   AgenticRouter — Typography tokens
+   Fonts: Inter (UI text) + JetBrains Mono (all numeric/monospace values —
+   token counts, costs, timestamps, session/trace IDs). Sizes/weights are the
+   exact Tailwind scale values found in app.css.
+   ========================================================================== */
+
+:root {
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Type scale (exact rem values from the compiled sheet) */
+  --text-xs:   0.75rem;  /* 12px, line-height 1rem */
+  --text-sm:   0.875rem; /* 14px, line-height 1.25rem */
+  --text-base: 1rem;     /* 16px body default */
+  --text-lg:   1.125rem; /* 18px, line-height 1.75rem */
+
+  --leading-tight: 1.25;
+  --leading-5: 1.25rem;
+  --leading-normal: 1.5;
+
+  --tracking-tight:  -0.025em;
+  --tracking-wide:    0.025em;
+  --tracking-widest:  0.1em;
+
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* Small uppercase label preceding a stat value (.ls-stat-label) */
+  --text-label-size: 10px;
+  --text-label-tracking: 0.05em;
+}

@@ -1,0 +1,7 @@
+/* AgenticRouter Design System — global stylesheet entry point.
+   List of @imports only; see tokens/ for the actual rules. */
+@import url('tokens/fonts.css');
+@import url('tokens/colors.css');
+@import url('tokens/typography.css');
+@import url('tokens/spacing.css');
+@import url('tokens/effects.css');

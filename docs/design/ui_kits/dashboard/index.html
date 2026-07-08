@@ -1,0 +1,38 @@
+<!-- @dsCard group="AgenticRouter Dashboard" viewport="1440x820" name="Dashboard" subtitle="Windows tray app: routing, cost & governance telemetry (interactive)" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>AgenticRouter Dashboard</title>
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  html, body, #root { height: 100%; margin: 0; overflow: hidden; background: var(--surface-page); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  // Babel standalone can't resolve ES module imports across files when loaded via plain <script>,
+  // so we inline-mount here instead — fetch each source file as text, strip import/export lines,
+  // and eval them in order into a shared scope. Keeps the UI kit's source files real ES modules
+  // (readable/editable on their own) while still working with zero build step in a static preview.
+  async function boot() {
+    const files = ["mockData.js", "Header.jsx", "LiveStream.jsx", "CostAnalytics.jsx", "ModelDistribution.jsx", "Governance.jsx", "SettingsModal.jsx", "Dashboard.jsx"];
+    let combined = "";
+    for (const f of files) {
+      const res = await fetch(f);
+      let src = await res.text();
+      src = src.replace(/^import .*$/gm, "").replace(/^export (function|const)/gm, "$1");
+      combined += "\n// ---- " + f + " ----\n" + src;
+    }
+    combined += "\nReactDOM.createRoot(document.getElementById('root')).render(React.createElement(Dashboard));\n";
+    const { code } = Babel.transform(combined, { presets: ["react"] });
+    (0, eval)(code);
+  }
+  boot();
+</script>
+</body>
+</html>

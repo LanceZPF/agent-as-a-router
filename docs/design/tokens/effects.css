@@ -1,0 +1,38 @@
+/* ==========================================================================
+   AgenticRouter — Motion & effects tokens
+   The dashboard is a data-dense ops console: motion is minimal, functional,
+   and never decorative. No bounces, no big entrance choreography.
+   ========================================================================== */
+
+:root {
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --duration-fast: 0.15s; /* @kind other */
+  --duration-slow: 0.2s; /* @kind other */
+
+  --shadow-tooltip: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Status dot pulse — used for the header's "LIVE" indicator and the green
+   "System Status: OK" dot. The only continuous/looping animation in the
+   product; everything else is a transition, not a loop. */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* Attention flash — fires exactly 3 times when the header's alert banner is
+   clicked, to draw the eye to the relevant Governance provider card. Never
+   used as a passive/looping effect. */
+@keyframes flash-border-amber {
+  0%, 100% { box-shadow: none; }
+  25%, 75% { box-shadow: 0 0 0 2px var(--amber-500); }
+  50%      { box-shadow: 0 0 0 3px var(--amber-500), 0 0 12px #f59e0b66; }
+}
+@keyframes flash-border-red {
+  0%, 100% { box-shadow: none; }
+  25%, 75% { box-shadow: 0 0 0 2px var(--red-500); }
+  50%      { box-shadow: 0 0 0 3px var(--red-500), 0 0 12px #ef444466; }
+}
+.flash-amber { animation: flash-border-amber 1.2s ease-in-out 3; }
+.flash-red   { animation: flash-border-red 1.2s ease-in-out 3; }

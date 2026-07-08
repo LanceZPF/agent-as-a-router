@@ -1,0 +1,27 @@
+/* ==========================================================================
+   AgenticRouter — Spacing & radii tokens
+   Exact values pulled from the compiled Tailwind utilities in app.css.
+   ========================================================================== */
+
+:root {
+  --space-0-5: 0.125rem;
+  --space-1:   0.25rem;
+  --space-1-5: 0.375rem;
+  --space-2:   0.5rem;
+  --space-2-5: 0.625rem;
+  --space-3:   0.75rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+
+  /* Corner radii — the dashboard uses a small, restrained set */
+  --radius-sm:   0.125rem; /* progress track, small chips */
+  --radius-md:   0.25rem;  /* .rounded — default chip/tag radius */
+  --radius-lg:   0.5rem;   /* .rounded-lg — cards, modals, inputs */
+  --radius-full: 9999px;   /* dots, pills, avatars */
+
+  /* Live Stream split-pane */
+  --split-left-default: 35%;
+  --split-left-min: 20%;
+  --split-left-max: 65%;
+}

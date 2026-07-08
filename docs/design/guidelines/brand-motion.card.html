@@ -1,0 +1,13 @@
+<!-- @dsCard group="Brand" viewport="700x150" name="Motion Principles" subtitle="Functional only: 150ms color transitions, 2s pulse, 3x flash" -->
+<html><head><link rel="stylesheet" href="../styles.css"></head>
+<body style="margin:0;background:var(--surface-card);font-family:var(--font-sans);padding:18px;box-sizing:border-box;color:var(--text-primary);display:flex;gap:24px;align-items:center;height:114px;">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+    <div style="width:10px;height:10px;border-radius:50%;background:var(--status-ok-fill);" class="pulse-dot"></div>
+    <span style="font-size:11px;color:var(--text-tertiary);">pulse-dot (live)</span>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+    <div style="width:56px;height:36px;border-radius:8px;background:var(--slate-700);transition:background-color .15s ease;" onmouseover="this.style.background='#263548'" onmouseout="this.style.background='var(--slate-700)'"></div>
+    <span style="font-size:11px;color:var(--text-tertiary);">hover this → 150ms</span>
+  </div>
+  <div style="font-size:12px;color:var(--text-secondary);max-width:280px;line-height:1.5;">No entrance choreography, no bounces, no infinite decorative loops. Motion exists to confirm state (hover, active tab) or draw attention once (breach flash), never to delight.</div>
+</body></html>
