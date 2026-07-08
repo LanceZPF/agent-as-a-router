@@ -9,7 +9,7 @@ does not start, stop, or otherwise manage it.
 - On launch, only a tray icon appears (no window, no console).
 - Right-click the tray icon and select **Show Dashboard** to open the dashboard window (or double-click
   the icon). The dashboard is a Razor single-page app hosted in a `BlazorWebView` - see
-  [`docs/agenticrouter-gui-dashboard.md`](../../docs/agenticrouter-gui-dashboard.md) for a full
+  [`docs/gui/dashboard.md`](../../docs/gui/dashboard.md) for a full
   description of the UI.
 - Clicking the dashboard window's minimize button, or its close (X) button, hides it back into the tray
   icon rather than minimizing to the taskbar or exiting the app.

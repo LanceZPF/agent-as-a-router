@@ -1,6 +1,6 @@
 # AgenticRouter Design System
 
-A design system built from **[davidpizon/agent-as-a-router](https://github.com/davidpizon/agent-as-a-router)**, specifically its `AgenticRouter.Gui` project (`src/AgenticRouter.Gui/`) and the docs describing it (`docs/agenticrouter-gui-dashboard.md`). Explore those paths further — and the repo's root `README.md` / `AGENTS.md` — for deeper product and architecture context than what's captured here.
+A design system built from **[davidpizon/agent-as-a-router](https://github.com/davidpizon/agent-as-a-router)**, specifically its `AgenticRouter.Gui` project (`src/AgenticRouter.Gui/`) and the docs describing it (`docs/gui/dashboard.md`). Explore those paths further — and the repo's root `README.md` / `AGENTS.md` — for deeper product and architecture context than what's captured here.
 
 ## Company / product context
 
@@ -8,7 +8,7 @@ A design system built from **[davidpizon/agent-as-a-router](https://github.com/d
 
 The one real **product UI** in the repo is **AgenticRouter.Gui**: a Windows system-tray application (.NET MAUI Blazor Hybrid) that shows a dashboard of routing, cost, and governance telemetry for the ACRouter proxy. It launches hidden in the tray; right-click → "Show Dashboard" opens a single window hosting a Razor single-page dashboard. **This design system is built entirely around that dashboard's visual language.**
 
-Important caveat: the dashboard's actual Razor component markup (`Components/*.razor`) is **not present in the repository** — only the compiled Tailwind stylesheet (`wwwroot/css/app.css`), the mock data model (`Models/DashboardData.cs`), the agent-color utility (`Utils/ColorUtils.cs`), and an extremely detailed prose spec (`docs/agenticrouter-gui-dashboard.md`) describing every tab, card, and interaction. Everything in this system's `ui_kits/dashboard/` was reconstructed from that CSS + data + spec, not copied component source — treat it as a faithful recreation, not a byte-for-byte port. If `Components/*.razor` becomes available later, re-check the UI kit against it.
+Note: the dashboard's actual Razor component markup now exists at `src/AgenticRouter.Gui/Components/*.razor` (it did not when this design system was first generated from `wwwroot/css/app.css`, `Models/DashboardData.cs`, `Utils/ColorUtils.cs`, and the prose spec at `docs/gui/dashboard.md`). This system's `ui_kits/dashboard/` was reconstructed from that CSS + data + spec, not copied component source — treat it as a faithful recreation, not a byte-for-byte port, and re-check it against the real `.razor` markup next time this design system is regenerated.
 
 Currently the dashboard displays **hard-coded mock data only** — it is not wired to the live proxy yet. This design system's mock data mirrors that same fixture data.
 
@@ -36,7 +36,7 @@ The source repository defines no company or product logo/brand mark. `assets/app
 
 ## Intentional additions
 
-The source defines a dashboard's worth of ad-hoc markup (per `docs/agenticrouter-gui-dashboard.md`), not a named component library, so the component set below was factored out of that spec rather than copied one-to-one from a component inventory:
+The source defines a dashboard's worth of ad-hoc markup (per `docs/gui/dashboard.md`), not a named component library, so the component set below was factored out of that spec rather than copied one-to-one from a component inventory:
 
 - **Button** — the doc implies primary/secondary/destructive actions (Settings' "Reset Stats"/"Clear History", the tray's "Show Dashboard") but never names a `Button` component explicitly.
 - **Input** — same reasoning, for the budget-cap and confirmation-word fields.
@@ -48,7 +48,7 @@ Everything else (Icon, Badge, ProgressBar, Tabs, Modal, Card, StatItem, AgentChi
 
 ## CONTENT FUNDAMENTALS
 
-The product has almost no marketing copy — it's an internal ops console, so "content" here means **UI microcopy and log/telemetry phrasing**, not brand voice copywriting. Drawing from `docs/agenticrouter-gui-dashboard.md` and `Models/DashboardData.cs`:
+The product has almost no marketing copy — it's an internal ops console, so "content" here means **UI microcopy and log/telemetry phrasing**, not brand voice copywriting. Drawing from `docs/gui/dashboard.md` and `Models/DashboardData.cs`:
 
 - **Voice**: terse, technical, third-person/systems-oriented — never "you"/"we". Labels read like a systems-monitoring tool, not a consumer app: "System Status: OK", "Fallback Engine Engaged", "Route Confirmed: claude-3-haiku".
 - **Casing**: Title Case for headers and tab labels ("Live Stream", "Cost Analytics", "Model Distribution", "Governance"); UPPERCASE for short status tags ("OK", "WARNING", "CRITICAL", "LIVE"); sentence case for routing-log messages and mock request/response text.
@@ -61,7 +61,7 @@ The product has almost no marketing copy — it's an internal ops console, so "c
 
 ## VISUAL FOUNDATIONS
 
-Source of truth: `src/AgenticRouter.Gui/wwwroot/css/app.css` (compiled Tailwind) + the "Visual theme" section of `docs/agenticrouter-gui-dashboard.md`.
+Source of truth: `src/AgenticRouter.Gui/wwwroot/css/app.css` (compiled Tailwind) + the "Visual theme" section of `docs/gui/dashboard.md`.
 
 - **Theme**: dark only, no light mode, no toggle. This is fixed at the app level (`html,body,#root { background:#0f172a }`).
 - **Color**: a slate neutral scale (`#0f172a` page → `#1e293b` cards/header/nav → `#334155` borders → `#e2e8f0` primary text) plus four semantic hues used consistently: sky `#38bdf8` (accent/info/active nav), emerald `#10b981` (positive/savings/OK), amber `#f59e0b` (warning), red `#ef4444` (critical). A separate 12-color deterministic palette (FNV-1a hash of agent name) tints agent-specific rows/borders/chips — never assigned by hand, always computed from the name so it's stable across sessions.

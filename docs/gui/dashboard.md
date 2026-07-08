@@ -2,7 +2,7 @@
 
 This document describes the dashboard UI rendered inside `AgenticRouter.Gui`'s window
 (`src/AgenticRouter.Gui/Components/`). For the tray-app shell itself (tray icon, show/hide behavior,
-build/run instructions), see [`src/AgenticRouter.Gui/README.md`](../src/AgenticRouter.Gui/README.md).
+build/run instructions), see [`src/AgenticRouter.Gui/README.md`](../../src/AgenticRouter.Gui/README.md).
 
 ## Purpose
 

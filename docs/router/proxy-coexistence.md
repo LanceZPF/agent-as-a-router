@@ -1,8 +1,16 @@
 # ACRouter Seamless Proxy Coexistence
 
+> **Status: Proposed — not yet implemented.** No proxy-settings detection, backup, restore, or
+> upstream-chaining code exists in `src/AgenticRouter/` today (verified: no registry/WinInet calls
+> anywhere in the codebase). The implemented proxy (`Proxy/ProxyServer.cs` et al.) is a standalone
+> local HTTP server; it neither reads nor modifies OS/IDE proxy settings. Everything below
+> describes a **proposed** design, not current behavior — treat code-level claims as aspirational
+> until this note is removed. See [system-proxy-architecture.md](./system-proxy-architecture.md)
+> for the related (also proposed) system-proxy interception design.
+
 ## Overview
 
-One of ACRouter's most important architectural features is its ability to **coexist seamlessly with existing proxy settings** without interference, conflicts, or data loss. Whether you use a corporate proxy, VPN, or custom proxy configuration, ACRouter automatically detects, backs up, and chains through your existing infrastructure.
+One of ACRouter's proposed architectural features is the ability to **coexist seamlessly with existing proxy settings** without interference, conflicts, or data loss. Whether you use a corporate proxy, VPN, or custom proxy configuration, the design calls for ACRouter to automatically detect, back up, and chain through your existing infrastructure.
 
 ---
 
@@ -643,6 +651,6 @@ ACRouter's seamless proxy coexistence is achieved through:
 
 ## See Also
 
-- [SYSTEM_PROXY_ARCHITECTURE.md](./SYSTEM_PROXY_ARCHITECTURE.md) — Low-level proxy implementation details
-- [AGENTS.md](../AGENTS.md) — Repository policies including Serilog logging
-- [docs/SERILOG_LOGGING_GUIDE.md](./SERILOG_LOGGING_GUIDE.md) — Logging all proxy operations
+- [system-proxy-architecture.md](./system-proxy-architecture.md) — Low-level proxy implementation details
+- [AGENTS.md](../../AGENTS.md) — Repository policies including Serilog logging
+- [serilog-logging-guide.md](./serilog-logging-guide.md) — Logging all proxy operations
