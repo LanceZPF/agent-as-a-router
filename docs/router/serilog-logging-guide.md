@@ -1,8 +1,19 @@
 # Serilog Logging Configuration Guide
 
+> **Status: Partially implemented.** The config-driven approach described here is real —
+> `Program.cs` calls `UseSerilog((context, services, cfg) => cfg.ReadFrom.Configuration(...))`,
+> and `appsettings.json`'s `Serilog` section is genuinely read at startup. What's **not**
+> implemented: only a `Console` sink is configured (`"WriteTo": [{ "Name": "Console" }]`), and
+> only `Serilog`, `Serilog.Extensions.Hosting`, `Serilog.Settings.Configuration`, and
+> `Serilog.Sinks.Console` are referenced in `AgenticRouter.csproj` — the `File` and `EventLog`
+> sinks and packages below (and the version numbers listed) are the **proposed** target
+> configuration, not what's installed today. There's also a separate bootstrap logger in
+> `Program.cs` (`Log.Logger = new LoggerConfiguration()...WriteTo.Console()`, used only before the
+> host is built) that is hardcoded, not config-driven.
+
 ## Overview
 
-This document describes the required Serilog logging configuration for the ACRouter .NET 10 application. Serilog provides structured logging with flexible output destinations (file and Windows Event Viewer) configured via `appsettings.json`.
+This document describes the target Serilog logging configuration for the ACRouter .NET 10 application. Serilog provides structured logging with flexible output destinations (file and Windows Event Viewer) configured via `appsettings.json`.
 
 ---
 

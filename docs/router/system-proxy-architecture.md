@@ -1,8 +1,16 @@
 # System Proxy Architecture for ACRouter .NET Implementation
 
+> **Status: Proposed — not yet implemented.** No OS-level proxy registration, WinInet/registry
+> interception, or upstream-proxy chaining exists in `src/AgenticRouter/` today. What *is*
+> implemented is a plain local HTTP reverse proxy (`Proxy/ProxyServer.cs`,
+> `Proxy/ProxyMiddleware.cs`, `Proxy/RequestInterceptor.cs`, `Proxy/ModelRouteResolver.cs`) that
+> clients must be pointed at explicitly (e.g. via `base_url`/`OPENAI_BASE_URL`) — it does not
+> register itself as the OS/IDE system proxy. Everything below is a design for a **future**
+> capability; treat code-level claims as aspirational until this note is removed.
+
 ## Overview
 
-This document describes the **System Proxy Interception** pattern that will be implemented in Phase 5 of the ACRouter C# migration. This architecture is based on the proven design from `cc-switch` (Rust/Tauri implementation) and provides transparent integration with GitHub Copilot, Visual Studio, VS Code, and all other IDE extensions without requiring IDE-specific modifications.
+This document describes the **System Proxy Interception** pattern proposed for a future phase of the ACRouter C# migration. This architecture is based on the proven design from `cc-switch` (Rust/Tauri implementation) and would provide transparent integration with GitHub Copilot, Visual Studio, VS Code, and all other IDE extensions without requiring IDE-specific modifications.
 
 ## Why System Proxy?
 
