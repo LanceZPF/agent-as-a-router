@@ -23,6 +23,7 @@ Matches the real, implemented app: a **.NET MAUI Blazor Hybrid** project at
 |---|---|
 | [`dashboard.md`](gui/dashboard.md) | Full prose spec of every tab, card, and interaction — the canonical reference for what the dashboard does today, including which parts now read live telemetry vs. mock data. |
 | [`livestream-redesign-plan.md`](gui/livestream-redesign-plan.md) | Design log for the Live Stream tab's conversation/turn-centric revision: context, decisions, and the rationale for departures from earlier iterations. |
+| [`console-tab-plan.md`](gui/console-tab-plan.md) | **(Proposed — not implemented)** UI/UX spec for a proposed fifth "Console" tab: a real-time, color-coded streaming log viewer with toggleable auto-scroll. No tab, log buffer, or log transport exists yet. |
 | [`backlog.md`](gui/backlog.md) | Not-yet-implemented work: the smaller gaps still unblocked by live proxy integration, plus deferred/optional items called out in the redesign plan. |
 
 The live-telemetry pipeline itself (proxy-side capture, SignalR transport, GUI-side aggregation) is

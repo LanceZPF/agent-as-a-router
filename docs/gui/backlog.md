@@ -36,6 +36,16 @@ reads `MockData` because no telemetry source exists for it yet:
   `http://localhost:5001/telemetry/hub`; there's no settings UI to point at a
   differently-configured proxy, since the GUI has no settings-persistence mechanism at all yet.
 
+### 2. New "Console" tab: streaming log viewer
+
+Fully specified in [`console-tab-plan.md`](console-tab-plan.md) but not started: a fifth tab
+showing a real-time, color-coded (`DEBUG`/`INFO`/`WARN`/`ERROR`/`FATAL`) log stream with a
+toggleable auto-scroll (and smart-disengage on manual scroll-up) and a clear-buffer action. Like
+the original live-telemetry item, this needs a proxy-side source before it can be real: nothing in
+`src/AgenticRouter/` currently emits structured, leveled log lines anywhere a client could stream
+from (`serilog-logging-guide.md` notes only a `Console` sink is wired up server-side, i.e. the
+proxy's own process console — not a client-facing stream).
+
 ## Recently completed
 
 ### ✅ Wire the dashboard to live AgenticRouter proxy telemetry, with real-time push updates
