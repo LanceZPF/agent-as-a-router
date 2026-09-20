@@ -87,6 +87,27 @@ ACRouter-OOD176 n=176 AvgPerf=73.30 CumReg=15.9 $Total=86.72 Perf/$=0.85
 All commands above write to `outputs/tmp/` so checked-in reference outputs are
 not overwritten.
 
+## v4.5 Reconstructed Release
+
+The `release/v4.5-reconstructed` branch packages the reproducible v4.5
+mechanism: the v4 Qwen3.5-0.8B LoRA voter, static voters, online top-10
+Memory-kNN, and a fixed Claude Opus 4.6 prior. The prior weight is 1.79,
+recovered by matching the archived seed-42 aggregate because the original
+v4.5 runner and exact prior weight are unavailable. This is an
+aggregate-matched reconstruction, not a new standalone v4.5 checkpoint.
+
+```bash
+git switch release/v4.5-reconstructed
+python scripts/replay_v45_ood176.py
+```
+
+The replay verifies the saved OOD176 decisions against the public matrix and
+reports `63.07 +/- 0.85%` for Static + LLM + Memory. The corresponding
+component adapter is published at
+[`Lance1573/acrouter-qwen35-08b-router-v45-reconstructed`](https://huggingface.co/Lance1573/acrouter-qwen35-08b-router-v45-reconstructed).
+It is the v4 LoRA FT-LLM component; the orchestration configuration and
+reconstruction provenance live under [`artifacts/v4.5/`](artifacts/v4.5/).
+
 ## Hugging Face Assets
 
 Dataset:

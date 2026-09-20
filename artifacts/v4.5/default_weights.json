@@ -1,0 +1,33 @@
+{
+  "calib_acc": {
+    "logreg": 0.39759036144578314,
+    "precomp_finetuned_router_qwen35_9b_v3": 0.46586345381526106,
+    "precomp_logreg": 0.3958691910499139,
+    "precomp_routellm_mf": 0.408491107286288,
+    "precomp_routellm_sw": 0.3987378083763626,
+    "precomp_tfidf_mlp": 0.38209982788296043,
+    "routellm_mf": 0.4044750430292599,
+    "routellm_sw": 0.3258749282845668,
+    "tfidf_mlp": 0.3970166379804934
+  },
+  "calib_size": 1743,
+  "median_acc": 0.39759036144578314,
+  "oracle": "rAcc3",
+  "weights": {
+    "api_llm": 1.5,
+    "dim_best": 0.9,
+    "logreg": 1.0,
+    "memory_knn": 1.2,
+    "precomp_finetuned_router_qwen35_08b": 1.05,
+    "precomp_finetuned_router_qwen35_27b_v3": 1.3,
+    "precomp_finetuned_router_qwen35_2b": 1.1,
+    "precomp_finetuned_router_qwen35_9b_v3": 1.1717171717171717,
+    "precomp_logreg": 0.9956709956709956,
+    "precomp_routellm_mf": 1.0274170274170273,
+    "precomp_routellm_sw": 1.002886002886003,
+    "precomp_tfidf_mlp": 0.961038961038961,
+    "routellm_mf": 1.0173160173160174,
+    "routellm_sw": 0.8196248196248196,
+    "tfidf_mlp": 0.9985569985569985
+  }
+}

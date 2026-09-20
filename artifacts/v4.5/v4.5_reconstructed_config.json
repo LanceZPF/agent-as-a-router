@@ -1,0 +1,46 @@
+{
+  "release": "v4.5-reconstructed",
+  "status": "reconstructed_mechanism",
+  "checkpoint_role": "v4_qwen35_08b_lora_ft_llm_component",
+  "hf_model_repo": "Lance1573/acrouter-qwen35-08b-router-v45-reconstructed",
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "main_prior": {
+    "model": "claude-opus-4-6",
+    "weight": 1.79,
+    "weight_status": "recovered_by_archived_seed42_aggregate_match"
+  },
+  "components": {
+    "static": true,
+    "llm": "Qwen3.5-0.8B v4 LoRA voter",
+    "memory": "online top-10 Memory-kNN using chosen-model feedback"
+  },
+  "protocol": {
+    "id_tasks": 2919,
+    "ood112_tasks": 112,
+    "ood176_tasks": 176,
+    "warm_start_entries": 4232,
+    "escalation": false,
+    "verifier_rerouting": false,
+    "ood_retuning": false,
+    "ood_policy": "archived v6 choices for OOD112 plus v4 voter cache for New64"
+  },
+  "metrics": {
+    "ID": {
+      "mean_pct": 48.591977046933884,
+      "sd_pct": 0.04463131275424562
+    },
+    "OOD-112": {
+      "mean_pct": 63.75,
+      "sd_pct": 0.46106944597707866
+    },
+    "OOD-176": {
+      "mean_pct": 63.06818181818182,
+      "sd_pct": 0.8469954460226473
+    }
+  },
+  "notes": [
+    "The original v4.5 runner and exact main-prior weight are absent; this release is the closest aggregate-matched reconstruction.",
+    "The LoRA adapter is a component checkpoint, not a standalone v4.5 router checkpoint.",
+    "The branch includes replay metadata and saved OOD176 decisions for verification."
+  ]
+}

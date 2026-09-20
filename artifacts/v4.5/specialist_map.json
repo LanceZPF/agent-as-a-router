@@ -1,0 +1,15 @@
+{
+  "calib_size": 1743,
+  "full_map": {
+    "algorithm": "precomp_finetuned_router_qwen35_9b_v3",
+    "bug_fixing": "precomp_routellm_mf",
+    "code_completion": "precomp_finetuned_router_qwen35_9b_v3",
+    "code_generation": "precomp_finetuned_router_qwen35_9b_v3",
+    "code_refactoring": "logreg",
+    "code_understanding": "precomp_tfidf_mlp",
+    "data_science": "routellm_mf",
+    "multi_language": "precomp_finetuned_router_qwen35_9b_v3",
+    "test_generation": "precomp_finetuned_router_qwen35_9b_v3"
+  },
+  "oracle": "rAcc3"
+}

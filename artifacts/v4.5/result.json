@@ -1,0 +1,6366 @@
+{
+  "status": "complete",
+  "experiment": "v45_fixed_main_prior_static_llm_memory_2x2x2_factorial",
+  "protocol": {
+    "groups": {
+      "static": "four runtime static routers, five ID precomputed voter traces, and DimensionBest",
+      "llm": "local Qwen3.5-0.8B v4 LoRA voter; unparseable outputs abstain",
+      "memory": "top-10 online Memory-kNN, selected-model execution feedback only"
+    },
+    "main_prior": {
+      "fixed_in_all_conditions": true,
+      "model": "claude-opus-4-6",
+      "weight": 1.79,
+      "source": "archived v4.5 config records main_prior=true",
+      "weight_recovery": "the archived file omits the numerical weight; 1.79 was recovered by matching the archived seed-42 aggregate"
+    },
+    "empty_cell": "The three voter groups are off, but the fixed Opus main prior still routes every task. This row is main-prior only.",
+    "stream_order": "independent NumPy default_rng permutation per paired seed",
+    "warm_start": "4232 decontaminated ID probing entries, DimensionBest model only",
+    "feedback": "chosen model's observed performance minus 10 times cost, available after routing",
+    "weights": "component weights loaded unchanged; the reconstructed main-prior weight is fixed across all conditions and datasets",
+    "length_gating": true,
+    "specialist_boost": 2.5,
+    "ood_retuning": false,
+    "reconstruction_uses_archived_ood112_aggregate": true,
+    "post_reconstruction_retuning": false,
+    "escalation": false,
+    "verifier_rerouting": false
+  },
+  "datasets": {
+    "ID": 2919,
+    "OOD-112": 112,
+    "OOD-176": 176
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "conditions": [
+    "static+llm+memory",
+    "static+llm",
+    "static+memory",
+    "llm+memory",
+    "static",
+    "llm",
+    "memory",
+    "fallback_only"
+  ],
+  "global_fallback": {
+    "model": "claude-opus-4-6",
+    "id_probing_means": {
+      "claude-opus-4-6": 0.4392454002671066,
+      "claude-sonnet-4-6": 0.4118001806897635,
+      "gpt-5.4": 0.4206984444968183,
+      "Qwen3-Max": 0.40261826440353815,
+      "qwen3.5-plus": 0.37568955141802185,
+      "kimi-k2.5": 0.37585962762196556,
+      "glm-5": 0.3744544426113599,
+      "MiniMax-M2.7": 0.3609597690313457
+    }
+  },
+  "weights": {
+    "api_llm": 1.5,
+    "logreg": 1.0,
+    "routellm_mf": 1.0173160173160174,
+    "routellm_sw": 0.8196248196248196,
+    "precomp_logreg": 0.9956709956709956,
+    "precomp_tfidf_mlp": 0.961038961038961,
+    "precomp_routellm_mf": 1.0274170274170273,
+    "precomp_finetuned_router_qwen35_9b_v3": 1.1717171717171717,
+    "precomp_finetuned_router_qwen35_27b_v3": 1.3,
+    "precomp_routellm_sw": 1.002886002886003,
+    "precomp_finetuned_router_qwen35_2b": 1.1,
+    "precomp_finetuned_router_qwen35_08b": 1.05,
+    "memory_knn": 1.2,
+    "dim_best": 0.9,
+    "tfidf_mlp": 0.9985569985569985
+  },
+  "specialist_map": {
+    "algorithm": "precomp_finetuned_router_qwen35_9b_v3",
+    "bug_fixing": "precomp_routellm_mf",
+    "code_completion": "precomp_finetuned_router_qwen35_9b_v3",
+    "code_generation": "precomp_finetuned_router_qwen35_9b_v3",
+    "code_refactoring": "logreg",
+    "code_understanding": "precomp_tfidf_mlp",
+    "data_science": "routellm_mf",
+    "multi_language": "precomp_finetuned_router_qwen35_9b_v3",
+    "test_generation": "precomp_finetuned_router_qwen35_9b_v3"
+  },
+  "fixed_voter_coverage": {
+    "ID": {
+      "logreg": 2919,
+      "precomp_finetuned_router_qwen35_9b_v3": 2919,
+      "precomp_logreg": 2919,
+      "precomp_routellm_mf": 2919,
+      "precomp_routellm_sw": 2919,
+      "precomp_tfidf_mlp": 2919,
+      "routellm_mf": 2919,
+      "routellm_sw": 2919,
+      "tfidf_mlp": 2919
+    },
+    "OOD-112": {
+      "logreg": 112,
+      "routellm_mf": 112,
+      "routellm_sw": 112,
+      "tfidf_mlp": 112
+    },
+    "OOD-176": {
+      "logreg": 176,
+      "routellm_mf": 176,
+      "routellm_sw": 176,
+      "tfidf_mlp": 176
+    }
+  },
+  "llm_voter": {
+    "sources": {
+      "id": {
+        "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/raw/section13_local_voter_2919.json"
+      },
+      "v45_ood112": {
+        "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/final_figures/data/routing/swebench112_results/L3_ft08b_router_v6_metrics.json"
+      },
+      "ood_shards": [
+        {
+          "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/ood176_v4_voter64_shard0.json"
+        },
+        {
+          "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/ood176_v4_voter64_shard1.json"
+        },
+        {
+          "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/ood176_v4_voter64_shard2.json"
+        },
+        {
+          "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/ood176_v4_voter64_shard3.json"
+        },
+        {
+          "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/ood176_v4_voter64_shard4.json"
+        },
+        {
+          "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/ood176_v4_voter64_shard5.json"
+        },
+        {
+          "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/ood176_v4_voter64_shard6.json"
+        },
+        {
+          "path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/ood176_v4_voter64_shard7.json"
+        }
+      ]
+    },
+    "coverage": {
+      "ID": {
+        "tasks": 2919,
+        "parsed_votes": 2916,
+        "abstentions": 3,
+        "parsed_pct": 99.89722507708119
+      },
+      "OOD-112": {
+        "tasks": 112,
+        "parsed_votes": 112,
+        "abstentions": 0,
+        "parsed_pct": 100.0
+      },
+      "OOD-176": {
+        "tasks": 176,
+        "parsed_votes": 125,
+        "abstentions": 51,
+        "parsed_pct": 71.02272727272727
+      }
+    },
+    "policy": "archived L3 v6 FT choices on old112; v4 voter cache on new64"
+  },
+  "neighbor_coverage": {
+    "ID": {
+      "minimum": 1,
+      "median": 131.0,
+      "maximum": 1115
+    },
+    "OOD-112": {
+      "minimum": 1,
+      "median": 1.0,
+      "maximum": 321
+    },
+    "OOD-176": {
+      "minimum": 1,
+      "median": 15.5,
+      "maximum": 848
+    }
+  },
+  "aggregate": {
+    "ID": {
+      "static+llm+memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 48.591977046933884,
+        "avg_perf_pct_sd": 0.04463131275424562,
+        "avg_perf_pct_ci95": [
+          48.5600497291326,
+          48.62390436473517
+        ],
+        "avg_perf_pct_values": [
+          48.556368619390206,
+          48.6448955121617,
+          48.5278040424803,
+          48.64184994861254,
+          48.5835457348407,
+          48.573823227132586,
+          48.58262761219596,
+          48.56011647824598,
+          48.581637547105174,
+          48.667101747173696
+        ],
+        "cumreg_mean": 245.57269,
+        "cumreg_sd": 1.3027880192963874,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 27498
+      },
+      "static+llm": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 48.40655704008222,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          48.40655704008222,
+          48.40655704008222
+        ],
+        "avg_perf_pct_values": [
+          48.40655704008222,
+          48.40655704008222,
+          48.40655704008222,
+          48.40655704008222,
+          48.40655704008222,
+          48.40655704008222,
+          48.40655704008222,
+          48.40655704008222,
+          48.40655704008222,
+          48.40655704008222
+        ],
+        "cumreg_mean": 250.9851,
+        "cumreg_sd": 1.9183191787719603e-14,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      },
+      "static+memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 48.78731072285029,
+        "avg_perf_pct_sd": 0.05733244320597601,
+        "avg_perf_pct_ci95": [
+          48.74629756366673,
+          48.82832388203386
+        ],
+        "avg_perf_pct_values": [
+          48.75518670777664,
+          48.759996574169236,
+          48.86830421377184,
+          48.871284686536484,
+          48.71561493662213,
+          48.77951353203152,
+          48.74746488523468,
+          48.75088729016786,
+          48.861500513874624,
+          48.763353888317916
+        ],
+        "cumreg_mean": 239.8709,
+        "cumreg_sd": 1.6735340171824011,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 27486
+      },
+      "llm+memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 47.387224848692476,
+        "avg_perf_pct_sd": 0.16028314677013117,
+        "avg_perf_pct_ci95": [
+          47.272565192739755,
+          47.5018845046452
+        ],
+        "avg_perf_pct_values": [
+          47.41370674888661,
+          47.11725705150166,
+          47.5032225648053,
+          47.36274751627269,
+          47.31959917780061,
+          47.34069430170149,
+          47.66060294621447,
+          47.463325339728215,
+          47.18300673746717,
+          47.50808610254653
+        ],
+        "cumreg_mean": 280.73940666666664,
+        "cumreg_sd": 4.678665054220084,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 27452
+      },
+      "static": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 48.50154847550532,
+        "avg_perf_pct_sd": 4.9681567217881264e-15,
+        "avg_perf_pct_ci95": [
+          48.50154847550531,
+          48.501548475505324
+        ],
+        "avg_perf_pct_values": [
+          48.50154847550532,
+          48.50154847550532,
+          48.50154847550532,
+          48.50154847550532,
+          48.5015484755053,
+          48.50154847550532,
+          48.50154847550532,
+          48.50154847550531,
+          48.50154847550531,
+          48.50154847550532
+        ],
+        "cumreg_mean": 248.2123,
+        "cumreg_sd": 2.0971378585631494e-14,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      },
+      "llm": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 44.1785554413612,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          44.1785554413612,
+          44.1785554413612
+        ],
+        "avg_perf_pct_values": [
+          44.1785554413612,
+          44.1785554413612,
+          44.1785554413612,
+          44.1785554413612,
+          44.1785554413612,
+          44.1785554413612,
+          44.1785554413612,
+          44.1785554413612,
+          44.1785554413612,
+          44.1785554413612
+        ],
+        "cumreg_mean": 374.40046666666666,
+        "cumreg_sd": 3.226695140469626e-14,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      },
+      "memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 43.832387804042476,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          43.832387804042476,
+          43.832387804042476
+        ],
+        "avg_perf_pct_values": [
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476
+        ],
+        "cumreg_mean": 384.50509999999997,
+        "cumreg_sd": 2.396728981215028e-14,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 27451
+      },
+      "fallback_only": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 43.832387804042476,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          43.832387804042476,
+          43.832387804042476
+        ],
+        "avg_perf_pct_values": [
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476,
+          43.832387804042476
+        ],
+        "cumreg_mean": 384.50509999999997,
+        "cumreg_sd": 2.396728981215028e-14,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      }
+    },
+    "OOD-112": {
+      "static+llm+memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 63.75,
+        "avg_perf_pct_sd": 0.46106944597707866,
+        "avg_perf_pct_ci95": [
+          63.42017078768823,
+          64.07982921231176
+        ],
+        "avg_perf_pct_values": [
+          64.28571428571429,
+          63.39285714285714,
+          63.39285714285714,
+          63.39285714285714,
+          63.39285714285714,
+          63.39285714285714,
+          64.28571428571429,
+          64.28571428571429,
+          64.28571428571429,
+          63.39285714285714
+        ],
+        "cumreg_mean": 13.6,
+        "cumreg_sd": 0.5163977794943223,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 404
+      },
+      "static+llm": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 65.17857142857143,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          65.17857142857143,
+          65.17857142857143
+        ],
+        "avg_perf_pct_values": [
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143
+        ],
+        "cumreg_mean": 12.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      },
+      "static+memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 59.82142857142857,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          59.82142857142857,
+          59.82142857142857
+        ],
+        "avg_perf_pct_values": [
+          59.82142857142857,
+          59.82142857142857,
+          59.82142857142857,
+          59.82142857142857,
+          59.82142857142857,
+          59.82142857142857,
+          59.82142857142857,
+          59.82142857142857,
+          59.82142857142857,
+          59.82142857142857
+        ],
+        "cumreg_mean": 18.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 405
+      },
+      "llm+memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 63.482142857142854,
+        "avg_perf_pct_sd": 0.5068269751763836,
+        "avg_perf_pct_ci95": [
+          63.11958068031821,
+          63.8447050339675
+        ],
+        "avg_perf_pct_values": [
+          63.39285714285714,
+          64.28571428571429,
+          62.5,
+          64.28571428571429,
+          63.39285714285714,
+          63.39285714285714,
+          63.39285714285714,
+          63.39285714285714,
+          63.39285714285714,
+          63.39285714285714
+        ],
+        "cumreg_mean": 13.9,
+        "cumreg_sd": 0.5676462121975467,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 411
+      },
+      "static": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 61.60714285714286,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          61.60714285714286,
+          61.60714285714286
+        ],
+        "avg_perf_pct_values": [
+          61.60714285714286,
+          61.60714285714286,
+          61.60714285714286,
+          61.60714285714286,
+          61.60714285714286,
+          61.60714285714286,
+          61.60714285714286,
+          61.60714285714286,
+          61.60714285714286,
+          61.60714285714286
+        ],
+        "cumreg_mean": 16.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      },
+      "llm": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 65.17857142857143,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          65.17857142857143,
+          65.17857142857143
+        ],
+        "avg_perf_pct_values": [
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143,
+          65.17857142857143
+        ],
+        "cumreg_mean": 12.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      },
+      "memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 66.07142857142857,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          66.07142857142857,
+          66.07142857142857
+        ],
+        "avg_perf_pct_values": [
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857
+        ],
+        "cumreg_mean": 11.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 405
+      },
+      "fallback_only": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 66.07142857142857,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          66.07142857142857,
+          66.07142857142857
+        ],
+        "avg_perf_pct_values": [
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857,
+          66.07142857142857
+        ],
+        "cumreg_mean": 11.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      }
+    },
+    "OOD-176": {
+      "static+llm+memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 63.06818181818182,
+        "avg_perf_pct_sd": 0.8469954460226473,
+        "avg_perf_pct_ci95": [
+          62.462277776543814,
+          63.674085859819826
+        ],
+        "avg_perf_pct_values": [
+          61.93181818181818,
+          61.93181818181818,
+          63.06818181818182,
+          64.20454545454545,
+          63.63636363636363,
+          62.5,
+          63.06818181818182,
+          64.20454545454545,
+          63.63636363636363,
+          62.5
+        ],
+        "cumreg_mean": 28.0,
+        "cumreg_sd": 1.4907119849998598,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 1095
+      },
+      "static+llm": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 63.63636363636363,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          63.63636363636363,
+          63.63636363636363
+        ],
+        "avg_perf_pct_values": [
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363
+        ],
+        "cumreg_mean": 27.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      },
+      "static+memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 61.13636363636363,
+        "avg_perf_pct_sd": 0.2934078292581423,
+        "avg_perf_pct_ci95": [
+          60.92647231943796,
+          61.346254953289304
+        ],
+        "avg_perf_pct_values": [
+          61.36363636363637,
+          60.79545454545454,
+          61.36363636363637,
+          60.79545454545454,
+          60.79545454545454,
+          60.79545454545454,
+          61.36363636363637,
+          61.36363636363637,
+          61.36363636363637,
+          61.36363636363637
+        ],
+        "cumreg_mean": 31.4,
+        "cumreg_sd": 0.5163977794943223,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 1095
+      },
+      "llm+memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 61.64772727272727,
+        "avg_perf_pct_sd": 0.6137065055310477,
+        "avg_perf_pct_ci95": [
+          61.20870808575651,
+          62.086746459698034
+        ],
+        "avg_perf_pct_values": [
+          61.36363636363637,
+          61.36363636363637,
+          61.36363636363637,
+          61.93181818181818,
+          61.93181818181818,
+          60.79545454545454,
+          61.93181818181818,
+          61.36363636363637,
+          63.06818181818182,
+          61.36363636363637
+        ],
+        "cumreg_mean": 30.5,
+        "cumreg_sd": 1.0801234497346435,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 1095
+      },
+      "static": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 60.79545454545454,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          60.79545454545454,
+          60.79545454545454
+        ],
+        "avg_perf_pct_values": [
+          60.79545454545454,
+          60.79545454545454,
+          60.79545454545454,
+          60.79545454545454,
+          60.79545454545454,
+          60.79545454545454,
+          60.79545454545454,
+          60.79545454545454,
+          60.79545454545454,
+          60.79545454545454
+        ],
+        "cumreg_mean": 32.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      },
+      "llm": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 63.63636363636363,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          63.63636363636363,
+          63.63636363636363
+        ],
+        "avg_perf_pct_values": [
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363
+        ],
+        "cumreg_mean": 27.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      },
+      "memory": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 63.63636363636363,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          63.63636363636363,
+          63.63636363636363
+        ],
+        "avg_perf_pct_values": [
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363
+        ],
+        "cumreg_mean": 27.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 1095
+      },
+      "fallback_only": {
+        "n_seeds": 10,
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "avg_perf_pct_mean": 63.63636363636363,
+        "avg_perf_pct_sd": 0.0,
+        "avg_perf_pct_ci95": [
+          63.63636363636363,
+          63.63636363636363
+        ],
+        "avg_perf_pct_values": [
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363,
+          63.63636363636363
+        ],
+        "cumreg_mean": 27.0,
+        "cumreg_sd": 0.0,
+        "fallback_count_total": 0,
+        "memory_vote_count_total": 0
+      }
+    }
+  },
+  "per_run_metrics": [
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 2919,
+      "avg_perf_pct": 48.556368619390206,
+      "cumreg": 246.6121,
+      "fallback_count": 0,
+      "memory_vote_count": 2753,
+      "memory_hit_count": 25959,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 984,
+        "claude-opus-4-6": 830,
+        "claude-sonnet-4-6": 52,
+        "gpt-5.4": 220,
+        "kimi-k2.5": 826
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 2919,
+      "avg_perf_pct": 48.6448955121617,
+      "cumreg": 244.02800000000002,
+      "fallback_count": 0,
+      "memory_vote_count": 2759,
+      "memory_hit_count": 25986,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 987,
+        "claude-opus-4-6": 831,
+        "claude-sonnet-4-6": 49,
+        "gpt-5.4": 218,
+        "kimi-k2.5": 827
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 2919,
+      "avg_perf_pct": 48.5278040424803,
+      "cumreg": 247.44589999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 2747,
+      "memory_hit_count": 25968,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 986,
+        "claude-opus-4-6": 830,
+        "claude-sonnet-4-6": 50,
+        "gpt-5.4": 219,
+        "kimi-k2.5": 827
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 2919,
+      "avg_perf_pct": 48.64184994861254,
+      "cumreg": 244.11690000000002,
+      "fallback_count": 0,
+      "memory_vote_count": 2752,
+      "memory_hit_count": 25993,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 985,
+        "claude-opus-4-6": 836,
+        "claude-sonnet-4-6": 50,
+        "gpt-5.4": 215,
+        "kimi-k2.5": 826
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 2919,
+      "avg_perf_pct": 48.5835457348407,
+      "cumreg": 245.8188,
+      "fallback_count": 0,
+      "memory_vote_count": 2747,
+      "memory_hit_count": 25972,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 980,
+        "claude-opus-4-6": 832,
+        "claude-sonnet-4-6": 50,
+        "gpt-5.4": 223,
+        "kimi-k2.5": 827
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 2919,
+      "avg_perf_pct": 48.573823227132586,
+      "cumreg": 246.1026,
+      "fallback_count": 0,
+      "memory_vote_count": 2743,
+      "memory_hit_count": 25957,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 984,
+        "claude-opus-4-6": 823,
+        "claude-sonnet-4-6": 50,
+        "gpt-5.4": 229,
+        "kimi-k2.5": 826
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 2919,
+      "avg_perf_pct": 48.58262761219596,
+      "cumreg": 245.84560000000002,
+      "fallback_count": 0,
+      "memory_vote_count": 2745,
+      "memory_hit_count": 25983,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 982,
+        "claude-opus-4-6": 834,
+        "claude-sonnet-4-6": 50,
+        "gpt-5.4": 219,
+        "kimi-k2.5": 827
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 2919,
+      "avg_perf_pct": 48.56011647824598,
+      "cumreg": 246.5027,
+      "fallback_count": 0,
+      "memory_vote_count": 2754,
+      "memory_hit_count": 25999,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 981,
+        "claude-opus-4-6": 828,
+        "claude-sonnet-4-6": 49,
+        "gpt-5.4": 222,
+        "kimi-k2.5": 832
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 2919,
+      "avg_perf_pct": 48.581637547105174,
+      "cumreg": 245.8745,
+      "fallback_count": 0,
+      "memory_vote_count": 2749,
+      "memory_hit_count": 25980,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 985,
+        "claude-opus-4-6": 830,
+        "claude-sonnet-4-6": 49,
+        "gpt-5.4": 218,
+        "kimi-k2.5": 830
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 2919,
+      "avg_perf_pct": 48.667101747173696,
+      "cumreg": 243.3798,
+      "fallback_count": 0,
+      "memory_vote_count": 2749,
+      "memory_hit_count": 25956,
+      "model_distribution": {
+        "MiniMax-M2.7": 7,
+        "Qwen3-Max": 983,
+        "claude-opus-4-6": 830,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 220,
+        "kimi-k2.5": 828
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.9851,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.98509999999996,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.98510000000002,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.9851,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.98510000000002,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.9851,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.98510000000002,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.9851,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.9851,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 2919,
+      "avg_perf_pct": 48.40655704008222,
+      "cumreg": 250.98510000000002,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 9,
+        "Qwen3-Max": 993,
+        "claude-opus-4-6": 808,
+        "claude-sonnet-4-6": 51,
+        "gpt-5.4": 221,
+        "kimi-k2.5": 837
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 2919,
+      "avg_perf_pct": 48.75518670777664,
+      "cumreg": 240.8086,
+      "fallback_count": 0,
+      "memory_vote_count": 2750,
+      "memory_hit_count": 25959,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 859,
+        "claude-opus-4-6": 774,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 307,
+        "kimi-k2.5": 902
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 2919,
+      "avg_perf_pct": 48.759996574169236,
+      "cumreg": 240.6682,
+      "fallback_count": 0,
+      "memory_vote_count": 2758,
+      "memory_hit_count": 25986,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 866,
+        "claude-opus-4-6": 774,
+        "claude-sonnet-4-6": 53,
+        "glm-5": 2,
+        "gpt-5.4": 307,
+        "kimi-k2.5": 896
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 2919,
+      "avg_perf_pct": 48.86830421377184,
+      "cumreg": 237.50670000000002,
+      "fallback_count": 0,
+      "memory_vote_count": 2746,
+      "memory_hit_count": 25968,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 866,
+        "claude-opus-4-6": 776,
+        "claude-sonnet-4-6": 55,
+        "glm-5": 2,
+        "gpt-5.4": 307,
+        "kimi-k2.5": 892
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 2919,
+      "avg_perf_pct": 48.871284686536484,
+      "cumreg": 237.4197,
+      "fallback_count": 0,
+      "memory_vote_count": 2751,
+      "memory_hit_count": 25993,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 863,
+        "claude-opus-4-6": 781,
+        "claude-sonnet-4-6": 53,
+        "glm-5": 2,
+        "gpt-5.4": 306,
+        "kimi-k2.5": 893
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 2919,
+      "avg_perf_pct": 48.71561493662213,
+      "cumreg": 241.96370000000002,
+      "fallback_count": 0,
+      "memory_vote_count": 2747,
+      "memory_hit_count": 25972,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 863,
+        "claude-opus-4-6": 772,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 310,
+        "kimi-k2.5": 897
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 2919,
+      "avg_perf_pct": 48.77951353203152,
+      "cumreg": 240.0985,
+      "fallback_count": 0,
+      "memory_vote_count": 2742,
+      "memory_hit_count": 25957,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 866,
+        "claude-opus-4-6": 776,
+        "claude-sonnet-4-6": 55,
+        "glm-5": 2,
+        "gpt-5.4": 307,
+        "kimi-k2.5": 892
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 2919,
+      "avg_perf_pct": 48.74746488523468,
+      "cumreg": 241.034,
+      "fallback_count": 0,
+      "memory_vote_count": 2742,
+      "memory_hit_count": 25983,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 858,
+        "claude-opus-4-6": 777,
+        "claude-sonnet-4-6": 58,
+        "glm-5": 2,
+        "gpt-5.4": 310,
+        "kimi-k2.5": 893
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 2919,
+      "avg_perf_pct": 48.75088729016786,
+      "cumreg": 240.9341,
+      "fallback_count": 0,
+      "memory_vote_count": 2753,
+      "memory_hit_count": 25999,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 855,
+        "claude-opus-4-6": 783,
+        "claude-sonnet-4-6": 56,
+        "glm-5": 2,
+        "gpt-5.4": 306,
+        "kimi-k2.5": 896
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 2919,
+      "avg_perf_pct": 48.861500513874624,
+      "cumreg": 237.7053,
+      "fallback_count": 0,
+      "memory_vote_count": 2749,
+      "memory_hit_count": 25980,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 862,
+        "claude-opus-4-6": 773,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 308,
+        "kimi-k2.5": 899
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 2919,
+      "avg_perf_pct": 48.763353888317916,
+      "cumreg": 240.5702,
+      "fallback_count": 0,
+      "memory_vote_count": 2748,
+      "memory_hit_count": 25956,
+      "model_distribution": {
+        "MiniMax-M2.7": 21,
+        "Qwen3-Max": 858,
+        "claude-opus-4-6": 774,
+        "claude-sonnet-4-6": 56,
+        "glm-5": 2,
+        "gpt-5.4": 310,
+        "kimi-k2.5": 898
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 2919,
+      "avg_perf_pct": 47.41370674888661,
+      "cumreg": 279.9664,
+      "fallback_count": 0,
+      "memory_vote_count": 2748,
+      "memory_hit_count": 25959,
+      "model_distribution": {
+        "Qwen3-Max": 430,
+        "claude-opus-4-6": 2449,
+        "claude-sonnet-4-6": 2,
+        "gpt-5.4": 5,
+        "kimi-k2.5": 33
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 2919,
+      "avg_perf_pct": 47.11725705150166,
+      "cumreg": 288.6197666666667,
+      "fallback_count": 0,
+      "memory_vote_count": 2751,
+      "memory_hit_count": 25986,
+      "model_distribution": {
+        "Qwen3-Max": 418,
+        "claude-opus-4-6": 2464,
+        "claude-sonnet-4-6": 1,
+        "gpt-5.4": 5,
+        "kimi-k2.5": 31
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 2919,
+      "avg_perf_pct": 47.5032225648053,
+      "cumreg": 277.3534333333333,
+      "fallback_count": 0,
+      "memory_vote_count": 2744,
+      "memory_hit_count": 25968,
+      "model_distribution": {
+        "Qwen3-Max": 440,
+        "claude-opus-4-6": 2442,
+        "claude-sonnet-4-6": 2,
+        "gpt-5.4": 4,
+        "kimi-k2.5": 31
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 2919,
+      "avg_perf_pct": 47.36274751627269,
+      "cumreg": 281.4539,
+      "fallback_count": 0,
+      "memory_vote_count": 2744,
+      "memory_hit_count": 25993,
+      "model_distribution": {
+        "Qwen3-Max": 422,
+        "claude-opus-4-6": 2453,
+        "claude-sonnet-4-6": 2,
+        "gpt-5.4": 5,
+        "kimi-k2.5": 37
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 2919,
+      "avg_perf_pct": 47.31959917780061,
+      "cumreg": 282.7134,
+      "fallback_count": 0,
+      "memory_vote_count": 2743,
+      "memory_hit_count": 25972,
+      "model_distribution": {
+        "Qwen3-Max": 421,
+        "claude-opus-4-6": 2462,
+        "claude-sonnet-4-6": 1,
+        "gpt-5.4": 6,
+        "kimi-k2.5": 29
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 2919,
+      "avg_perf_pct": 47.34069430170149,
+      "cumreg": 282.0976333333333,
+      "fallback_count": 0,
+      "memory_vote_count": 2742,
+      "memory_hit_count": 25957,
+      "model_distribution": {
+        "Qwen3-Max": 437,
+        "claude-opus-4-6": 2445,
+        "claude-sonnet-4-6": 1,
+        "gpt-5.4": 4,
+        "kimi-k2.5": 32
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 2919,
+      "avg_perf_pct": 47.66060294621447,
+      "cumreg": 272.7595,
+      "fallback_count": 0,
+      "memory_vote_count": 2748,
+      "memory_hit_count": 25983,
+      "model_distribution": {
+        "Qwen3-Max": 427,
+        "claude-opus-4-6": 2455,
+        "claude-sonnet-4-6": 2,
+        "gpt-5.4": 5,
+        "kimi-k2.5": 30
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 2919,
+      "avg_perf_pct": 47.463325339728215,
+      "cumreg": 278.51803333333334,
+      "fallback_count": 0,
+      "memory_vote_count": 2744,
+      "memory_hit_count": 25999,
+      "model_distribution": {
+        "Qwen3-Max": 431,
+        "claude-opus-4-6": 2450,
+        "claude-sonnet-4-6": 1,
+        "gpt-5.4": 4,
+        "kimi-k2.5": 33
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 2919,
+      "avg_perf_pct": 47.18300673746717,
+      "cumreg": 286.7005333333333,
+      "fallback_count": 0,
+      "memory_vote_count": 2744,
+      "memory_hit_count": 25980,
+      "model_distribution": {
+        "Qwen3-Max": 428,
+        "claude-opus-4-6": 2447,
+        "claude-sonnet-4-6": 2,
+        "gpt-5.4": 4,
+        "kimi-k2.5": 38
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 2919,
+      "avg_perf_pct": 47.50808610254653,
+      "cumreg": 277.21146666666664,
+      "fallback_count": 0,
+      "memory_vote_count": 2744,
+      "memory_hit_count": 25956,
+      "model_distribution": {
+        "Qwen3-Max": 430,
+        "claude-opus-4-6": 2444,
+        "claude-sonnet-4-6": 2,
+        "gpt-5.4": 5,
+        "kimi-k2.5": 38
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 2919,
+      "avg_perf_pct": 48.50154847550532,
+      "cumreg": 248.21229999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 2919,
+      "avg_perf_pct": 48.50154847550532,
+      "cumreg": 248.2123,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 2919,
+      "avg_perf_pct": 48.50154847550532,
+      "cumreg": 248.2123,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 2919,
+      "avg_perf_pct": 48.50154847550532,
+      "cumreg": 248.2123,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 2919,
+      "avg_perf_pct": 48.5015484755053,
+      "cumreg": 248.21230000000003,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 2919,
+      "avg_perf_pct": 48.50154847550532,
+      "cumreg": 248.21230000000003,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 2919,
+      "avg_perf_pct": 48.50154847550532,
+      "cumreg": 248.2123,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 2919,
+      "avg_perf_pct": 48.50154847550531,
+      "cumreg": 248.21229999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 2919,
+      "avg_perf_pct": 48.50154847550531,
+      "cumreg": 248.21229999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 2919,
+      "avg_perf_pct": 48.50154847550532,
+      "cumreg": 248.2123,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "MiniMax-M2.7": 23,
+        "Qwen3-Max": 870,
+        "claude-opus-4-6": 742,
+        "claude-sonnet-4-6": 54,
+        "glm-5": 2,
+        "gpt-5.4": 313,
+        "kimi-k2.5": 915
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.40046666666666,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.40046666666666,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.4004666666667,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.40046666666666,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.4004666666667,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.40046666666666,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.40046666666666,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.4004666666666,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.40046666666666,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 2919,
+      "avg_perf_pct": 44.1785554413612,
+      "cumreg": 374.40046666666666,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 25,
+        "claude-opus-4-6": 2875,
+        "gpt-5.4": 1,
+        "kimi-k2.5": 18
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 2747,
+      "memory_hit_count": 25959,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 2750,
+      "memory_hit_count": 25986,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 2745,
+      "memory_hit_count": 25968,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 2745,
+      "memory_hit_count": 25993,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.5051,
+      "fallback_count": 0,
+      "memory_vote_count": 2742,
+      "memory_hit_count": 25972,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 2741,
+      "memory_hit_count": 25957,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 2749,
+      "memory_hit_count": 25983,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 2746,
+      "memory_hit_count": 25999,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.5051,
+      "fallback_count": 0,
+      "memory_vote_count": 2743,
+      "memory_hit_count": 25980,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 2743,
+      "memory_hit_count": 25956,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.5051,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.5051,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "ID",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 2919,
+      "avg_perf_pct": 43.832387804042476,
+      "cumreg": 384.50509999999997,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 2919
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 112,
+      "avg_perf_pct": 64.28571428571429,
+      "cumreg": 13.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 328,
+      "model_distribution": {
+        "Qwen3-Max": 2,
+        "claude-opus-4-6": 104,
+        "kimi-k2.5": 6
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "Qwen3-Max": 3,
+        "claude-opus-4-6": 102,
+        "kimi-k2.5": 7
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 317,
+      "model_distribution": {
+        "Qwen3-Max": 2,
+        "claude-opus-4-6": 105,
+        "kimi-k2.5": 5
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 332,
+      "model_distribution": {
+        "Qwen3-Max": 2,
+        "claude-opus-4-6": 101,
+        "kimi-k2.5": 9
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 325,
+      "model_distribution": {
+        "Qwen3-Max": 2,
+        "claude-opus-4-6": 102,
+        "kimi-k2.5": 8
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 320,
+      "model_distribution": {
+        "Qwen3-Max": 3,
+        "claude-opus-4-6": 104,
+        "kimi-k2.5": 5
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 112,
+      "avg_perf_pct": 64.28571428571429,
+      "cumreg": 13.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "Qwen3-Max": 2,
+        "claude-opus-4-6": 103,
+        "kimi-k2.5": 7
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 112,
+      "avg_perf_pct": 64.28571428571429,
+      "cumreg": 13.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "Qwen3-Max": 3,
+        "claude-opus-4-6": 103,
+        "kimi-k2.5": 6
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 112,
+      "avg_perf_pct": 64.28571428571429,
+      "cumreg": 13.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 323,
+      "model_distribution": {
+        "Qwen3-Max": 3,
+        "claude-opus-4-6": 103,
+        "kimi-k2.5": 6
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 327,
+      "model_distribution": {
+        "Qwen3-Max": 3,
+        "claude-opus-4-6": 102,
+        "kimi-k2.5": 7
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 110,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 328,
+      "model_distribution": {
+        "Qwen3-Max": 11,
+        "claude-opus-4-6": 101
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "Qwen3-Max": 12,
+        "claude-opus-4-6": 100
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 317,
+      "model_distribution": {
+        "Qwen3-Max": 11,
+        "claude-opus-4-6": 101
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 332,
+      "model_distribution": {
+        "Qwen3-Max": 11,
+        "claude-opus-4-6": 101
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 325,
+      "model_distribution": {
+        "Qwen3-Max": 11,
+        "claude-opus-4-6": 101
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 320,
+      "model_distribution": {
+        "Qwen3-Max": 12,
+        "claude-opus-4-6": 100
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "Qwen3-Max": 11,
+        "claude-opus-4-6": 101
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "Qwen3-Max": 12,
+        "claude-opus-4-6": 100
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 323,
+      "model_distribution": {
+        "Qwen3-Max": 12,
+        "claude-opus-4-6": 100
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 112,
+      "avg_perf_pct": 59.82142857142857,
+      "cumreg": 18.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 327,
+      "model_distribution": {
+        "Qwen3-Max": 12,
+        "claude-opus-4-6": 100
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 328,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 112,
+      "avg_perf_pct": 64.28571428571429,
+      "cumreg": 13.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 112,
+      "avg_perf_pct": 62.5,
+      "cumreg": 15.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 317,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 112,
+      "avg_perf_pct": 64.28571428571429,
+      "cumreg": 13.0,
+      "fallback_count": 0,
+      "memory_vote_count": 42,
+      "memory_hit_count": 332,
+      "model_distribution": {
+        "claude-opus-4-6": 97,
+        "kimi-k2.5": 15
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 325,
+      "model_distribution": {
+        "claude-opus-4-6": 97,
+        "kimi-k2.5": 15
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 42,
+      "memory_hit_count": 320,
+      "model_distribution": {
+        "claude-opus-4-6": 100,
+        "kimi-k2.5": 12
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "claude-opus-4-6": 97,
+        "kimi-k2.5": 15
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 42,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 323,
+      "model_distribution": {
+        "claude-opus-4-6": 98,
+        "kimi-k2.5": 14
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 112,
+      "avg_perf_pct": 63.39285714285714,
+      "cumreg": 14.0,
+      "fallback_count": 0,
+      "memory_vote_count": 42,
+      "memory_hit_count": 327,
+      "model_distribution": {
+        "claude-opus-4-6": 97,
+        "kimi-k2.5": 15
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 112,
+      "avg_perf_pct": 61.60714285714286,
+      "cumreg": 16.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 104
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 112,
+      "avg_perf_pct": 65.17857142857143,
+      "cumreg": 12.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 99,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 328,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 317,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 332,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 325,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 320,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 324,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 40,
+      "memory_hit_count": 323,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 41,
+      "memory_hit_count": 327,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-112",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 112,
+      "avg_perf_pct": 66.07142857142857,
+      "cumreg": 11.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 112
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 176,
+      "avg_perf_pct": 61.93181818181818,
+      "cumreg": 30.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 1005,
+      "model_distribution": {
+        "Qwen3-Max": 17,
+        "claude-opus-4-6": 151,
+        "kimi-k2.5": 8
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 176,
+      "avg_perf_pct": 61.93181818181818,
+      "cumreg": 30.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 989,
+      "model_distribution": {
+        "Qwen3-Max": 16,
+        "claude-opus-4-6": 157,
+        "kimi-k2.5": 3
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 176,
+      "avg_perf_pct": 63.06818181818182,
+      "cumreg": 28.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 1008,
+      "model_distribution": {
+        "Qwen3-Max": 13,
+        "claude-opus-4-6": 158,
+        "kimi-k2.5": 5
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 176,
+      "avg_perf_pct": 64.20454545454545,
+      "cumreg": 26.0,
+      "fallback_count": 0,
+      "memory_vote_count": 106,
+      "memory_hit_count": 983,
+      "model_distribution": {
+        "Qwen3-Max": 15,
+        "claude-opus-4-6": 155,
+        "kimi-k2.5": 6
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 112,
+      "memory_hit_count": 1014,
+      "model_distribution": {
+        "Qwen3-Max": 21,
+        "claude-opus-4-6": 148,
+        "kimi-k2.5": 7
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 176,
+      "avg_perf_pct": 62.5,
+      "cumreg": 29.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 1004,
+      "model_distribution": {
+        "Qwen3-Max": 18,
+        "claude-opus-4-6": 155,
+        "kimi-k2.5": 3
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 176,
+      "avg_perf_pct": 63.06818181818182,
+      "cumreg": 28.0,
+      "fallback_count": 0,
+      "memory_vote_count": 108,
+      "memory_hit_count": 1003,
+      "model_distribution": {
+        "Qwen3-Max": 20,
+        "claude-opus-4-6": 151,
+        "kimi-k2.5": 5
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 176,
+      "avg_perf_pct": 64.20454545454545,
+      "cumreg": 26.0,
+      "fallback_count": 0,
+      "memory_vote_count": 112,
+      "memory_hit_count": 1015,
+      "model_distribution": {
+        "Qwen3-Max": 21,
+        "claude-opus-4-6": 149,
+        "kimi-k2.5": 6
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 993,
+      "model_distribution": {
+        "Qwen3-Max": 14,
+        "claude-opus-4-6": 157,
+        "kimi-k2.5": 5
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm+memory",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 176,
+      "avg_perf_pct": 62.5,
+      "cumreg": 29.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 990,
+      "model_distribution": {
+        "Qwen3-Max": 13,
+        "claude-opus-4-6": 157,
+        "kimi-k2.5": 6
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+llm",
+      "groups": {
+        "static": true,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 164,
+        "kimi-k2.5": 2
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 1005,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 167
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 989,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 167
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 1008,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 106,
+      "memory_hit_count": 983,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 167
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 112,
+      "memory_hit_count": 1014,
+      "model_distribution": {
+        "Qwen3-Max": 10,
+        "claude-opus-4-6": 166
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 1004,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 167
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 108,
+      "memory_hit_count": 1003,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 112,
+      "memory_hit_count": 1015,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 167
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 993,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static+memory",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 990,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 167
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 1005,
+      "model_distribution": {
+        "Qwen3-Max": 6,
+        "claude-opus-4-6": 155,
+        "kimi-k2.5": 15
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 989,
+      "model_distribution": {
+        "Qwen3-Max": 1,
+        "claude-opus-4-6": 163,
+        "kimi-k2.5": 12
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 1008,
+      "model_distribution": {
+        "claude-opus-4-6": 162,
+        "kimi-k2.5": 14
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 176,
+      "avg_perf_pct": 61.93181818181818,
+      "cumreg": 30.0,
+      "fallback_count": 0,
+      "memory_vote_count": 106,
+      "memory_hit_count": 983,
+      "model_distribution": {
+        "Qwen3-Max": 5,
+        "claude-opus-4-6": 156,
+        "kimi-k2.5": 15
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 176,
+      "avg_perf_pct": 61.93181818181818,
+      "cumreg": 30.0,
+      "fallback_count": 0,
+      "memory_vote_count": 112,
+      "memory_hit_count": 1014,
+      "model_distribution": {
+        "Qwen3-Max": 7,
+        "claude-opus-4-6": 155,
+        "kimi-k2.5": 14
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 1004,
+      "model_distribution": {
+        "Qwen3-Max": 4,
+        "claude-opus-4-6": 158,
+        "kimi-k2.5": 14
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 176,
+      "avg_perf_pct": 61.93181818181818,
+      "cumreg": 30.0,
+      "fallback_count": 0,
+      "memory_vote_count": 108,
+      "memory_hit_count": 1003,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 152,
+        "kimi-k2.5": 15
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 112,
+      "memory_hit_count": 1015,
+      "model_distribution": {
+        "Qwen3-Max": 1,
+        "claude-opus-4-6": 160,
+        "kimi-k2.5": 15
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 176,
+      "avg_perf_pct": 63.06818181818182,
+      "cumreg": 28.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 993,
+      "model_distribution": {
+        "Qwen3-Max": 4,
+        "claude-opus-4-6": 161,
+        "kimi-k2.5": 11
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm+memory",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 176,
+      "avg_perf_pct": 61.36363636363637,
+      "cumreg": 31.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 990,
+      "model_distribution": {
+        "Qwen3-Max": 1,
+        "claude-opus-4-6": 159,
+        "kimi-k2.5": 16
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "static",
+      "groups": {
+        "static": true,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 176,
+      "avg_perf_pct": 60.79545454545454,
+      "cumreg": 32.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 8,
+        "claude-opus-4-6": 168
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "llm",
+      "groups": {
+        "static": false,
+        "llm": true,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "Qwen3-Max": 9,
+        "claude-opus-4-6": 154,
+        "kimi-k2.5": 13
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 0,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 1005,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 1,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 989,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 2,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 1008,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 3,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 106,
+      "memory_hit_count": 983,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 4,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 112,
+      "memory_hit_count": 1014,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 5,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 110,
+      "memory_hit_count": 1004,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 6,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 108,
+      "memory_hit_count": 1003,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 7,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 112,
+      "memory_hit_count": 1015,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 8,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 993,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "memory",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": true
+      },
+      "seed": 9,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 109,
+      "memory_hit_count": 990,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 0,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 1,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 2,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 3,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 4,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 5,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 6,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 7,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 8,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    },
+    {
+      "dataset": "OOD-176",
+      "condition": "fallback_only",
+      "groups": {
+        "static": false,
+        "llm": false,
+        "memory": false
+      },
+      "seed": 9,
+      "n": 176,
+      "avg_perf_pct": 63.63636363636363,
+      "cumreg": 27.0,
+      "fallback_count": 0,
+      "memory_vote_count": 0,
+      "memory_hit_count": 0,
+      "model_distribution": {
+        "claude-opus-4-6": 176
+      }
+    }
+  ],
+  "id_seed42_reference_comparison": {
+    "available": true,
+    "reference_path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/raw/section16_full_calibrated_seed42.records.jsonl",
+    "shared": 2919,
+    "agreement_count": 2716,
+    "agreement_pct": 93.04556354916068,
+    "difference_count": 203,
+    "difference_examples": [
+      {
+        "task_id": "dim1_bcb_BigCodeBench/544",
+        "reference": "kimi-k2.5",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_bcb_BigCodeBench/564",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_bcb_BigCodeBench/893",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_bcb_BigCodeBench/951",
+        "reference": "kimi-k2.5",
+        "factorial": "Qwen3-Max"
+      },
+      {
+        "task_id": "dim1_bcb_BigCodeBench/972",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_humaneval_HumanEval_149",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_2",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_257",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_278",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_311",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_391",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_419",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_428",
+        "reference": "kimi-k2.5",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_447",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_599",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_619",
+        "reference": "kimi-k2.5",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_631",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_767",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim1_mbpp_8",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-opus-4-6"
+      },
+      {
+        "task_id": "dim2_lcb_abc342_e",
+        "reference": "Qwen3-Max",
+        "factorial": "claude-sonnet-4-6"
+      }
+    ]
+  },
+  "v45_seed42_archive_comparison": {
+    "archive_path": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/final_figures/data/routing/swebench112_results/acrouter_run_v4.5_swe112_metrics.json",
+    "tasks": 112,
+    "archived_resolved": 70,
+    "reconstructed_resolved": 70,
+    "aggregate_match": true,
+    "choice_agreement": 96,
+    "choice_agreement_pct": 85.71428571428571,
+    "outcome_agreement": 106,
+    "outcome_agreement_pct": 94.64285714285714,
+    "difference_count": 16,
+    "differences": [
+      {
+        "task_id": "astropy__astropy-13033",
+        "archived_model": "claude-opus-4-6",
+        "reconstructed_model": "kimi-k2.5",
+        "archived_resolved": false,
+        "reconstructed_resolved": false
+      },
+      {
+        "task_id": "django__django-11815",
+        "archived_model": "claude-sonnet-4-6",
+        "reconstructed_model": "claude-opus-4-6",
+        "archived_resolved": true,
+        "reconstructed_resolved": true
+      },
+      {
+        "task_id": "django__django-12193",
+        "archived_model": "claude-sonnet-4-6",
+        "reconstructed_model": "claude-opus-4-6",
+        "archived_resolved": true,
+        "reconstructed_resolved": true
+      },
+      {
+        "task_id": "django__django-13195",
+        "archived_model": "claude-sonnet-4-6",
+        "reconstructed_model": "claude-opus-4-6",
+        "archived_resolved": false,
+        "reconstructed_resolved": false
+      },
+      {
+        "task_id": "django__django-12155",
+        "archived_model": "Qwen3-Max",
+        "reconstructed_model": "claude-opus-4-6",
+        "archived_resolved": false,
+        "reconstructed_resolved": true
+      },
+      {
+        "task_id": "astropy__astropy-14995",
+        "archived_model": "claude-opus-4-6",
+        "reconstructed_model": "kimi-k2.5",
+        "archived_resolved": true,
+        "reconstructed_resolved": false
+      },
+      {
+        "task_id": "django__django-11848",
+        "archived_model": "claude-sonnet-4-6",
+        "reconstructed_model": "claude-opus-4-6",
+        "archived_resolved": true,
+        "reconstructed_resolved": true
+      },
+      {
+        "task_id": "django__django-14053",
+        "archived_model": "qwen3.5-plus",
+        "reconstructed_model": "claude-opus-4-6",
+        "archived_resolved": false,
+        "reconstructed_resolved": true
+      },
+      {
+        "task_id": "astropy__astropy-13579",
+        "archived_model": "claude-opus-4-6",
+        "reconstructed_model": "kimi-k2.5",
+        "archived_resolved": true,
+        "reconstructed_resolved": true
+      },
+      {
+        "task_id": "django__django-10097",
+        "archived_model": "claude-sonnet-4-6",
+        "reconstructed_model": "claude-opus-4-6",
+        "archived_resolved": false,
+        "reconstructed_resolved": false
+      },
+      {
+        "task_id": "django__django-13820",
+        "archived_model": "claude-opus-4-6",
+        "reconstructed_model": "kimi-k2.5",
+        "archived_resolved": true,
+        "reconstructed_resolved": false
+      },
+      {
+        "task_id": "django__django-14792",
+        "archived_model": "Qwen3-Max",
+        "reconstructed_model": "claude-opus-4-6",
+        "archived_resolved": false,
+        "reconstructed_resolved": false
+      },
+      {
+        "task_id": "astropy__astropy-14309",
+        "archived_model": "claude-opus-4-6",
+        "reconstructed_model": "kimi-k2.5",
+        "archived_resolved": true,
+        "reconstructed_resolved": true
+      },
+      {
+        "task_id": "django__django-14631",
+        "archived_model": "claude-sonnet-4-6",
+        "reconstructed_model": "claude-opus-4-6",
+        "archived_resolved": false,
+        "reconstructed_resolved": true
+      },
+      {
+        "task_id": "django__django-11734",
+        "archived_model": "claude-opus-4-6",
+        "reconstructed_model": "kimi-k2.5",
+        "archived_resolved": false,
+        "reconstructed_resolved": false
+      },
+      {
+        "task_id": "django__django-13406",
+        "archived_model": "claude-opus-4-6",
+        "reconstructed_model": "kimi-k2.5",
+        "archived_resolved": true,
+        "reconstructed_resolved": false
+      }
+    ],
+    "exact_task_level_reproduction": false,
+    "note": "The original v4.5 runner and exact main-prior weight are absent. This is the closest aggregate-matched reconstruction among the archived prior-weight diagnostics, not an exact task-level replay."
+  },
+  "paths": {
+    "runner": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/run_orchestrator_voter_factorial.py",
+    "canonical": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/final_figures/data/routing/canonical/oracle_labels_n2919.jsonl",
+    "ood_tasks": "<NUS_ZPF_ROOT>/h100_router/OOD_dataset/unified/tasks.jsonl",
+    "ood_matrix": "<NUS_ZPF_ROOT>/h100_router/OOD_dataset/unified/matrix_acrouter_ood176.json",
+    "weights": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/acrouter_v4.0/cache/default_weights.json",
+    "specialists": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/acrouter_v4.0/cache/specialist_map.json",
+    "fixed_voter_cache": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/orchestrator_factorial_fixed_votes.json",
+    "id_seed42_decisions": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/orchestrator_voter_factorial_v45_fixed_prior/id_seed42_full_decisions.jsonl",
+    "v45_archive": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/final_figures/data/routing/swebench112_results/acrouter_run_v4.5_swe112_metrics.json",
+    "v45_ft_metrics": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/final_figures/data/routing/swebench112_results/L3_ft08b_router_v6_metrics.json",
+    "ood112_seed42_decisions": "<AGENTIC_EFFICIENCY_ROOT>/Agentic_efficiency/rebuttal/new_response/raw/orchestrator_voter_factorial_v45_fixed_prior/ood112_seed42_full_decisions.jsonl"
+  },
+  "wall_time_sec": 9.916764920577407
+}
