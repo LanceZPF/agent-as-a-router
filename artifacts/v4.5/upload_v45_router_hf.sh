@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 LOCAL_ROOT="${ACROUTER_LOCAL_ROOT:-$(cd "$REPO_ROOT/.." && pwd)/Agentic_efficiency}"
 ADAPTER_DIR="${ADAPTER_DIR:-$LOCAL_ROOT/coding-router/models/finetuned_router_qwen35_08b_v4/adapter}"
 HF_REPO="${1:-${HF_REPO:-Lance1573/acrouter-qwen35-08b-router-v45-reconstructed}}"
